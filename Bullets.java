@@ -82,8 +82,8 @@ public class Bullets {
 			break;
 		}
 
-		if (x < 0 || y < 0 || x > TankClient.Fram_width
-				|| y > TankClient.Fram_length) {
+		if (x < 0 || y < 0 || x > TankClient.FRAM_WIDTH
+				|| y > TankClient.FRAM_LENGTH) {
 			live = false;
 		}
 	}
