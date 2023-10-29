@@ -3,7 +3,8 @@ import java.awt.event.*;
 import java.util.*;
 
 public class Tank {
-	public static int speedX = 6, speedY =6;
+	public static final int speedX = 6;
+	public static final int speedY =6;
 	public static int count = 0;
 	public static final int WIDTH = 35;
 	public static final int LENGHT = 35;
@@ -14,7 +15,8 @@ public class Tank {
 	private boolean good;
 	private int x;
 	private int y;
-	private int oldX, oldY;
+	private int oldX;
+	private int oldY;
 	private boolean live = true;
 	private int life = 200;
 	private int rate=1;
@@ -172,10 +174,7 @@ public class Tank {
 		else if(tempx>600&&tempy>300&&tempy<715) return 3;
 	return 1;
 	}
-	public int getdirect(int b){
-		if(b==13){
-			
-		}
+	public int getDirect(int b){
 		return 4;
 	}
 	private void changToOldDir() {  
@@ -406,17 +405,6 @@ public class Tank {
 
 	public void setLife(int life) {
 		this.life = life;
-	}
-
-	private class DrawBloodbBar {
-		public void draw(Graphics g) {
-			Color c = g.getColor();
-			g.setColor(Color.RED);
-			g.drawRect(375, 585, WIDTH, 10);
-			int w = WIDTH * life / 200;
-			g.fillRect(375, 585, w, 10);
-			g.setColor(c);
-		}
 	}
 
 	public boolean eat(GetBlood b) {
