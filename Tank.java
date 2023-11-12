@@ -11,7 +11,6 @@ public class Tank {
 	private static int count = 0;
 	private Position position;
 	private TankDrawer drawer;
-	private KeyEventHandler keyHandler;
 
 	public int getSpeedX() {
 		return speedX;
@@ -36,8 +35,6 @@ public class Tank {
 	public static void setCount(int count) {
 		Tank.count = count;
 	}
-
-
 
 	private Direction direction = Direction.STOP;
 	private Direction myDirection = Direction.U;
@@ -81,10 +78,9 @@ public class Tank {
 	}
 
 	public Tank(int x, int y, boolean good) {
-		this.x = x;
-		this.y = y;
-		this.oldX = x;
-		this.oldY = y;
+		this.position = new Position(x, y);
+		this.oldX = position.getX();
+		this.oldY = position.getY();
 		this.good = good;
 	}
 
@@ -92,7 +88,7 @@ public class Tank {
 		this(x, y, good);
 		this.direction = dir;
 		this.tc = tc;
-		this.player=player;
+		this.player = player;
 	}
 
 	public void draw(Graphics g) {
@@ -102,37 +98,36 @@ public class Tank {
 			}
 			return;
 		}
-		//if (good)
 		switch (myDirection) {
 
 			case D:
-				if(player==1){	g.drawImage(tankImags[4], x, y, null);
+				if(player==1){	g.drawImage(tankImags[4], position.getX(), position.getY(), null);
 				}
 				else if(tc.Player2&&player==2){
-					g.drawImage(tankImags[8], x, y, null);
+					g.drawImage(tankImags[8], position.getX(), position.getY(), null);
 				}else{
-					g.drawImage(tankImags[0], x, y, null);}
+					g.drawImage(tankImags[0], position.getX(), position.getY(), null);}
 				break;
 
 			case U:
-				if(player==1){	g.drawImage(tankImags[5], x, y, null);
+				if(player==1){	g.drawImage(tankImags[5], position.getX(), position.getY(), null);
 				}else if(tc.Player2&&player==2){
-					g.drawImage(tankImags[9], x, y, null);
+					g.drawImage(tankImags[9], position.getX(), position.getY(), null);
 				}else{
-					g.drawImage(tankImags[1], x, y, null);}
+					g.drawImage(tankImags[1], position.getX(), position.getY(), null);}
 				break;
-			case L:if(player==1){	g.drawImage(tankImags[6], x, y, null);
+			case L:if(player==1){	g.drawImage(tankImags[6], position.getX(), position.getY(), null);
 			}else if(tc.Player2&&player==2){
-				g.drawImage(tankImags[10], x, y, null);
+				g.drawImage(tankImags[10], position.getX(), position.getY(), null);
 			}else{
-				g.drawImage(tankImags[2], x, y, null);}
+				g.drawImage(tankImags[2], position.getX(), position.getY(), null);}
 				break;
 
-			case R:if(player==1){	g.drawImage(tankImags[7], x, y, null);
+			case R:if(player==1){	g.drawImage(tankImags[7], position.getX(), position.getY(), null);
 			}else if(tc.Player2&&player==2){
-				g.drawImage(tankImags[11], x, y, null);
+				g.drawImage(tankImags[11], position.getX(), position.getY(), null);
 			}else{
-				g.drawImage(tankImags[3], x, y, null);}
+				g.drawImage(tankImags[3], position.getX(), position.getY(), null);}
 				break;
 
 		}
@@ -141,22 +136,21 @@ public class Tank {
 	}
 
 	void move() {
-
-		this.oldX = x;
-		this.oldY = y;
+		this.oldX = position.getX();
+		this.oldY = position.getY();
 
 		switch (direction) {
 			case L:
-				x -= speedX;
+				position.setX(position.getX() - speedX);
 				break;
 			case U:
-				y -= speedY;
+				position.setY(position.getY() - speedY);
 				break;
 			case R:
-				x += speedX;
+				position.setX(position.getX() + speedX);
 				break;
 			case D:
-				y += speedY;
+				position.setY(position.getY() + speedY);
 				break;
 			case STOP:
 				break;
@@ -166,13 +160,13 @@ public class Tank {
 			this.myDirection = this.direction;
 		}
 
-		if (x < 0)
-			x = 0;
-		if (y < 40)
-			y = 40;
-		if (x + Tank.WIDTH > TankClient.Fram_width)
+		if (position.getX() < 0)
+			position.setX(0);
+		if (position.getY() < 40)
+			position.setY(40);
+		if (position.getX() + Tank.WIDTH > TankClient.Fram_width)
 			x = TankClient.Fram_width - Tank.WIDTH;
-		if (y + Tank.LENGHT > TankClient.Fram_length)
+		if (position.getY() + Tank.LENGHT > TankClient.Fram_length)
 			y = TankClient.Fram_length - Tank.LENGHT;
 
 		if (!good) {
@@ -181,10 +175,10 @@ public class Tank {
 				step = r.nextInt(12) + 3;
 				int mod=r.nextInt(9);
 				if (playertankaround()){
-					if(x==tc.homeTank.x){ if(y>tc.homeTank.y) direction=directons[1];
-					else if (y<tc.homeTank.y) direction=directons[3];
-					}else if(y==tc.homeTank.y){ if(x>tc.homeTank.x) direction=directons[0];
-					else if (x<tc.homeTank.x) direction=directons[2];
+					if(position.getX()==tc.homeTank.x){ if(position.getY()>tc.homeTank.y) direction=directons[1];
+					else if (position.getY()<tc.homeTank.y) direction=directons[3];
+					}else if(position.getY()==tc.homeTank.y){ if(position.getX()>tc.homeTank.x) direction=directons[0];
+					else if (position.getX()<tc.homeTank.x) direction=directons[2];
 					}
 					else{
 						int rn = r.nextInt(directons.length);
@@ -209,10 +203,10 @@ public class Tank {
 		}
 	}
 	public boolean playertankaround(){
-		int rx=x-15;
-		int ry=y-15;
-		if((x-15)<0) rx=0;
-		if((y-15)<0)ry=0;
+		int rx=position.getX()-15;
+		int ry=position.getY()-15;
+		if((position.getX()-15)<0) rx=0;
+		if((position.getY()-15)<0)ry=0;
 		Rectangle a=new Rectangle(rx, ry,60,60);
 		if (this.live && a.intersects(tc.homeTank.getRect())) {
 			return true;
@@ -223,8 +217,8 @@ public class Tank {
 		return 4;
 	}
 	private void changToOldDir() {
-		x = oldX;
-		y = oldY;
+		position.setX(oldX);
+		position.setY(oldY);
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -381,8 +375,8 @@ public class Tank {
 	public Bullets fire() {
 		if (!live)
 			return null;
-		int X = this.x + Tank.WIDTH / 2 - Bullets.width / 2;
-		int Y = this.y + Tank.LENGHT / 2 - Bullets.length / 2;
+		int X = position.getX() + Tank.WIDTH / 2 - Bullets.width / 2;
+		int Y = position.getY()  + Tank.LENGHT / 2 - Bullets.length / 2;
 		Bullets m = new Bullets(X, Y + 2, good, myDirection, this.tc);
 		tc.bullets.add(m);
 		return m;
@@ -390,7 +384,7 @@ public class Tank {
 
 
 	public Rectangle getRect() {
-		return new Rectangle(x, y, WIDTH, LENGHT);
+		return new Rectangle(position.getX(), position.getY(), WIDTH, LENGHT);
 	}
 
 	public boolean isLive() {
@@ -476,4 +470,5 @@ public class Tank {
 	public int getY() {
 		return y;
 	}
+
 }
