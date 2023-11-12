@@ -489,34 +489,34 @@ public class TankClient extends Frame implements ActionListener {
 			printable = true;
 			new Thread(new PaintThread()).start(); 
 		} else if (e.getActionCommand().equals("level1")) {
-			Tank.count = 12;
-			Tank.speedX = 6;
-			Tank.speedY = 6;
+			Tank.setCount(12);
+			Tank.setSpeedX(6);
+			Tank.setSpeedY(6);
 			Bullets.speedX = 10;
 			Bullets.speedY = 10;
 			this.dispose();
 			new TankClient();
 		} else if (e.getActionCommand().equals("level2")) {
-			Tank.count = 12;
-			Tank.speedX = 10;
-			Tank.speedY = 10;
+			Tank.setCount(12);
+			Tank.setSpeedX(10);
+			Tank.setSpeedY(10);
 			Bullets.speedX = 12;
 			Bullets.speedY = 12;
 			this.dispose();
 			new TankClient();
 
 		} else if (e.getActionCommand().equals("level3")) {
-			Tank.count = 20;
-			Tank.speedX = 14;
-			Tank.speedY = 14;
+			Tank.setCount(20);
+			Tank.setSpeedX(14);
+			Tank.setSpeedY(14);
 			Bullets.speedX = 16;
 			Bullets.speedY = 16;
 			this.dispose();
 			new TankClient();
 		} else if (e.getActionCommand().equals("level4")) {
-			Tank.count = 20;
-			Tank.speedX = 16;
-			Tank.speedY = 16;
+			Tank.setCount(20);
+			Tank.setSpeedX(16);
+			Tank.setSpeedY(16);
 			Bullets.speedX = 18;
 			Bullets.speedY = 18;
 			this.dispose();

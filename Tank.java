@@ -1,13 +1,44 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class Tank {
-	public static final int speedX = 6;
-	public static final int speedY =6;
-	public static int count = 0;
-	public static final int WIDTH = 35;
-	public static final int LENGHT = 35;
+	private static final int LENGHT = 35;
+	private static final int WIDTH = 35;
+	private static int speedX = 6;
+	private static int speedY = 6;
+	private static int count = 0;
+	private Position position;
+	private TankDrawer drawer;
+	private KeyEventHandler keyHandler;
+
+	public int getSpeedX() {
+		return speedX;
+	}
+
+	public static void setSpeedX(int speedX) {
+		Tank.speedX = speedX;
+	}
+
+	public  int getSpeedY() {
+		return speedY;
+	}
+
+	public static void setSpeedY(int speedY) {
+		Tank.speedY = speedY;
+	}
+
+	public  int getCount() {
+		return count;
+	}
+
+	public static void setCount(int count) {
+		Tank.count = count;
+	}
+
+
+
 	private Direction direction = Direction.STOP;
 	private Direction myDirection = Direction.U;
 	TankClient tc;
@@ -23,10 +54,10 @@ public class Tank {
 	private static Random r = new Random();
 	private int step = r.nextInt(10)+5 ;
 
-	private boolean bL = false;
-	private boolean bU = false;
-	private boolean bR = false;
-	private boolean bD = false;
+	private boolean isMovingLeft = false;
+	private boolean isMovingUp = false;
+	private boolean isMovingRight = false;
+	private boolean isMovingDown = false;
 
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
@@ -188,22 +219,6 @@ public class Tank {
 		}
 		return false;
 	}
-	public int getzone(int x,int y){
-		int tempx=x;
-		int tempy=y;
-		if (tempx<85&&tempy<300) return 11;
-		else if(tempx>85&&tempx<140&&tempy>0&&tempy<100) return 9;
-		else if(tempx>85&&tempx<140&&tempy>254&&tempy<300) return 10;
-		else if(tempx>0&&tempx<200&&tempy>300&&tempy<715) return 12;
-		else if(tempx>140&&tempx<400&&tempy>0&&tempy<150) return 7;
-		else if(tempx>140&&tempx<400&&tempy>210&&tempy<300) return 8;
-		else if(tempx>400&&tempx<500&&tempy>0&&tempy<300) return 6;
-		else if(tempx>500&&tempy>0&&tempy<180) return 5;
-		else if(tempx>500&&tempy>180&&tempy<300) return 4;
-		else if(tempx>520&&tempx<600&&tempy>3000&&tempy<715) return 2;
-		else if(tempx>600&&tempy>300&&tempy<715) return 3;
-		return 1;
-	}
 	public int getDirect(int b){
 		return 4;
 	}
@@ -217,85 +232,94 @@ public class Tank {
 		if (player==1){
 			switch (key) {
 				case KeyEvent.VK_R:
-					tc.tanks.clear();
-					tc.bullets.clear();
-					tc.trees.clear();
-					tc.otherWall.clear();
-					tc.homeWall.clear();
-					tc.metalWall.clear();
-					tc.homeTank.setLive(false);
-					if (tc.tanks.size() == 0) {
-						for (int i = 0; i < 20; i++) {
-							if (i < 9)
-								tc.tanks.add(new Tank(150 + 70 * i, 40, false,
-										Direction.R, tc,0));
-							else if (i < 15)
-								tc.tanks.add(new Tank(700, 140 + 50 * (i -6), false,
-										Direction.D, tc,0));
-							else
-								tc.tanks.add(new Tank(10,  50 * (i - 12), false,
-										Direction.L, tc,0));
-						}
-					}
-
-					tc.homeTank = new Tank(300, 560, true, Direction.STOP, tc,0);
-					if (!tc.home.isLive())
-						tc.home.setLive(true);
-					TankClient abc=new TankClient();
-					if (tc.Player2) abc.Player2=true;
+					restartGame();
 					break;
+
 				case KeyEvent.VK_D:
-					bR = true;
+					isMovingRight = true;
 					break;
 
 				case KeyEvent.VK_A:
-					bL = true;
+					isMovingLeft = true;
 					break;
 
 				case KeyEvent.VK_W:
-					bU = true;
+					isMovingUp = true;
 					break;
 
 				case KeyEvent.VK_S:
-					bD = true;
+					isMovingDown = true;
 					break;
 			}}
 		if (player==2){
 			switch(key){
 				case KeyEvent.VK_RIGHT:
-					bR = true;
+					isMovingRight = true;
 					break;
 
 				case KeyEvent.VK_LEFT:
-					bL = true;
+					isMovingLeft = true;
 					break;
 
 				case KeyEvent.VK_UP:
-					bU = true;
+					isMovingUp = true;
 					break;
 
 				case KeyEvent.VK_DOWN:
-					bD = true;
+					isMovingDown = true;
 					break;
 			}
 		}
 		decideDirection();
 	}
 
+	private void initializeEnemyTanks() {
+		for (int i = 0; i < 20; i++) {
+			if (i < 9)
+				tc.tanks.add(new Tank(150 + 70 * i, 40, false, Direction.R, tc, 0));
+			else if (i < 15)
+				tc.tanks.add(new Tank(700, 140 + 50 * (i - 6), false, Direction.D, tc, 0));
+			else
+				tc.tanks.add(new Tank(10, 50 * (i - 12), false, Direction.L, tc, 0));
+		}
+	}
+
+	private void restartGame() {
+		tc.tanks.clear();
+		tc.bullets.clear();
+		tc.trees.clear();
+		tc.otherWall.clear();
+		tc.homeWall.clear();
+		tc.metalWall.clear();
+		tc.homeTank.setLive(false);
+
+		if (tc.tanks.size() == 0) {
+			initializeEnemyTanks();
+		}
+
+		tc.homeTank = new Tank(300, 560, true, Direction.STOP, tc, 0);
+
+		if (!tc.home.isLive())
+			tc.home.setLive(true);
+
+		TankClient abc = new TankClient();
+		if (tc.Player2) abc.Player2 = true;
+	}
+
 	void decideDirection() {
-		if (!bL && !bU && bR && !bD)
+		if (!isMovingLeft && !isMovingUp && isMovingRight && !isMovingDown)
 			direction = Direction.R;
 
-		else if (bL && !bU && !bR && !bD)
+		else if (isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
 			direction = Direction.L;
 
-		else if (!bL && bU && !bR && !bD)
+		else if (!isMovingLeft && isMovingUp && !isMovingRight && !isMovingDown)
 			direction = Direction.U;
 
-		else if (!bL && !bU && !bR && bD)
+		else if (!isMovingLeft && !isMovingUp && !isMovingRight && isMovingDown)
 			direction = Direction.D;
 
-		else if (!bL && !bU && !bR && !bD)
+		else if (!isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
 			direction = Direction.STOP;
 	}
 
@@ -309,19 +333,19 @@ public class Tank {
 					break;
 
 				case KeyEvent.VK_D:
-					bR = false;
+					isMovingRight = false;
 					break;
 
 				case KeyEvent.VK_A:
-					bL = false;
+					isMovingLeft = false;
 					break;
 
 				case KeyEvent.VK_W:
-					bU = false;
+					isMovingUp = false;
 					break;
 
 				case KeyEvent.VK_S:
-					bD = false;
+					isMovingDown = false;
 					break;
 
 
@@ -334,19 +358,19 @@ public class Tank {
 					break;
 
 				case KeyEvent.VK_RIGHT:
-					bR = false;
+					isMovingRight = false;
 					break;
 
 				case KeyEvent.VK_LEFT:
-					bL = false;
+					isMovingLeft = false;
 					break;
 
 				case KeyEvent.VK_UP:
-					bU = false;
+					isMovingUp = false;
 					break;
 
 				case KeyEvent.VK_DOWN:
-					bD = false;
+					isMovingDown = false;
 					break;
 
 
@@ -413,16 +437,12 @@ public class Tank {
 		return false;
 	}
 
-	public boolean collideWithTanks(java.util.List<Tank> tanks) {
-		for (int i = 0; i < tanks.size(); i++) {
-			Tank t = tanks.get(i);
-			if (this != t) {
-				if (this.live && t.isLive()
-						&& this.getRect().intersects(t.getRect())) {
-					this.changToOldDir();
-					t.changToOldDir();
-					return true;
-				}
+	public boolean collideWithTanks(List<Tank> tanks) {
+		for (Tank t : tanks) {
+			if (this != t && this.live && t.isLive() && this.getRect().intersects(t.getRect())) {
+				this.changToOldDir();
+				t.changToOldDir();
+				return true;
 			}
 		}
 		return false;
