@@ -148,11 +148,13 @@ public class TankClient extends Frame implements ActionListener {
                 Bullets bts = bullets.get(j);
                 m.hitBullet(bts);
             }
-            for (MetalWall mw : metalWall) {
+            for (int j = 0; j < metalWall.size(); j++) {
+                MetalWall mw = metalWall.get(j);
                 m.hitWall(mw);
             }
 
-            for (CommonWall w : otherWall) {
+            for (int j = 0; j < otherWall.size(); j++) {
+                CommonWall w = otherWall.get(j);
                 m.hitWall(w);
             }
 
@@ -246,8 +248,6 @@ public class TankClient extends Frame implements ActionListener {
     public TankClient() {
 
         initializeMenus();
-
-        addMenuItems();
 
         addMenuListener(newGameMenuItem, "NewGame");
         addMenuListener(exitMenuItem, "Exit");
@@ -406,6 +406,8 @@ public class TankClient extends Frame implements ActionListener {
         AdditionMenu = new Menu("Addition");
         setMenuFont(gameMenu, pauseContinueMenu, helpMenu, levelMenu, AdditionMenu);
 
+        addMenuItems();
+
         gameMenu.add(newGameMenuItem);
         gameMenu.add(exitMenuItem);
         pauseContinueMenu.add(stopMenuItem);
@@ -504,68 +506,69 @@ public class TankClient extends Frame implements ActionListener {
 
             }
 
-        } else if (e.getActionCommand().equals("Player2")) {
-            printable = false;
-            Object[] options = {"Confirm", "Cancel"};
-            int response = JOptionPane.showOptionDialog(this, "Confirm to add player2?", "",
-                    JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                    options, options[0]);
-            if (response == 0) {
-                printable = true;
-                this.dispose();
-                TankClient Player2add = new TankClient();
-                Player2add.player2 = true;
-            } else {
-                printable = true;
-                new Thread(new PaintThread()).start();
-            }
-        } else if (e.getActionCommand().equals("help")) {
-            printable = false;
-            JOptionPane.showMessageDialog(null, "Use WSAD to control Player1's direction, use F to fire and restart with pressing R\nUse diection key to Control Player2, use slash to fire",
-                    "Help", JOptionPane.INFORMATION_MESSAGE);
-            this.setVisible(true);
-            printable = true;
-            new Thread(new PaintThread()).start();
-        } else if (e.getActionCommand().equals("level1")) {
-            Tank.count = 12;
-            Tank.speedX = 6;
-            Tank.speedY = 6;
-            Bullets.speedX = 10;
-            Bullets.speedY = 10;
-            this.dispose();
-            new TankClient();
-        } else if (e.getActionCommand().equals("level2")) {
-            Tank.count = 12;
-            Tank.speedX = 10;
-            Tank.speedY = 10;
-            Bullets.speedX = 12;
-            Bullets.speedY = 12;
-            this.dispose();
-            new TankClient();
+		} else if(e.getActionCommand().equals("Player2")){
+			printable = false;
+			Object[] options = { "Confirm", "Cancel" };
+			int response = JOptionPane.showOptionDialog(this, "Confirm to add player2?", "",
+					JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+					options, options[0]);
+			if (response == 0) {
+				printable = true;
+				this.dispose();
+				TankClient Player2add=new TankClient();
+				Player2add.player2=true;
+			} else {
+				printable = true;
+				new Thread(new PaintThread()).start();
+			}
+		}
+		else if (e.getActionCommand().equals("help")) {
+			printable = false;
+			JOptionPane.showMessageDialog(null, "Use WSAD to control Player1's direction, use F to fire and restart with pressing R\nUse diection key to Control Player2, use slash to fire",
+					"Help", JOptionPane.INFORMATION_MESSAGE);
+			this.setVisible(true);
+			printable = true;
+			new Thread(new PaintThread()).start();
+		} else if (e.getActionCommand().equals("level1")) {
+			Tank.setCount(12);
+			Tank.setSpeedX(6);
+			Tank.setSpeedY(6);
+			Bullets.speedX = 10;
+			Bullets.speedY = 10;
+			this.dispose();
+			new TankClient();
+		} else if (e.getActionCommand().equals("level2")) {
+			Tank.setCount(12);
+			Tank.setSpeedX(10);
+			Tank.setSpeedY(10);
+			Bullets.speedX = 12;
+			Bullets.speedY = 12;
+			this.dispose();
+			new TankClient();
 
-        } else if (e.getActionCommand().equals("level3")) {
-            Tank.count = 20;
-            Tank.speedX = 14;
-            Tank.speedY = 14;
-            Bullets.speedX = 16;
-            Bullets.speedY = 16;
-            this.dispose();
-            new TankClient();
-        } else if (e.getActionCommand().equals("level4")) {
-            Tank.count = 20;
-            Tank.speedX = 16;
-            Tank.speedY = 16;
-            Bullets.speedX = 18;
-            Bullets.speedY = 18;
-            this.dispose();
-            new TankClient();
-        } else if (e.getActionCommand().equals("Join")) {
-            printable = false;
-            String s = JOptionPane.showInputDialog("Please input URL:");
-            System.out.println(s);
-            printable = true;
-            new Thread(new PaintThread()).start();
-        }
+		} else if (e.getActionCommand().equals("level3")) {
+			Tank.setCount(20);
+			Tank.setSpeedX(14);
+			Tank.setSpeedY(14);
+			Bullets.speedX = 16;
+			Bullets.speedY = 16;
+			this.dispose();
+			new TankClient();
+		} else if (e.getActionCommand().equals("level4")) {
+			Tank.setCount(20);
+			Tank.setSpeedX(16);
+			Tank.setSpeedY(16);
+			Bullets.speedX = 18;
+			Bullets.speedY = 18;
+			this.dispose();
+			new TankClient();
+		} else if (e.getActionCommand().equals("Join")){
+			printable = false;
+			String s=JOptionPane.showInputDialog("Please input URL:");
+			System.out.println(s);
+			printable = true;
+			new Thread(new PaintThread()).start();
+		}
 
-    }
+	}
 }

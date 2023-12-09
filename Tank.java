@@ -1,52 +1,86 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class Tank {
-	public static  int speedX = 6, speedY =6; 
-	public static int count = 0;
-	public static final int width = 35, length = 35;
+	private static final int LENGHT = 35;
+	private static final int WIDTH = 35;
+	private static int speedX = 6;
+	private static int speedY = 6;
+	private static int count = 0;
+	private Position position;
+	private TankDrawer drawer;
+
+	public int getSpeedX() {
+		return speedX;
+	}
+
+	public static void setSpeedX(int speedX) {
+		Tank.speedX = speedX;
+	}
+
+	public  int getSpeedY() {
+		return speedY;
+	}
+
+	public static void setSpeedY(int speedY) {
+		Tank.speedY = speedY;
+	}
+
+	public  int getCount() {
+		return count;
+	}
+
+	public static void setCount(int count) {
+		Tank.count = count;
+	}
+
 	private Direction direction = Direction.STOP;
-	private Direction Kdirection = Direction.U; 
+	private Direction myDirection = Direction.U;
 	TankClient tc;
 	private int player=0;
 	private boolean good;
-	private int x, y;
-	private int oldX, oldY;
+	private int x;
+	private int y;
+	private int oldX;
+	private int oldY;
 	private boolean live = true;
 	private int life = 200;
 	private int rate=1;
 	private static Random r = new Random();
-	private int step = r.nextInt(10)+5 ; 
+	private int step = r.nextInt(10)+5 ;
 
-	private boolean bL = false, bU = false, bR = false, bD = false;
-	
+	private boolean isMovingLeft = false;
+	private boolean isMovingUp = false;
+	private boolean isMovingRight = false;
+	private boolean isMovingDown = false;
+
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
-	private static Image[] tankImags = null; 
+	private static Image[] tankImags = null;
 	static {
 		tankImags = new Image[] {
 				tk.getImage(BombTank.class.getResource("Images/tankD.gif")),
 				tk.getImage(BombTank.class.getResource("Images/tankU.gif")),
 				tk.getImage(BombTank.class.getResource("Images/tankL.gif")),
-				tk.getImage(BombTank.class.getResource("Images/tankR.gif")), 
-				tk.getImage(BombTank.class.getResource("Images/HtankD.gif")), 
-				tk.getImage(BombTank.class.getResource("Images/HtankU.gif")), 
+				tk.getImage(BombTank.class.getResource("Images/tankR.gif")),
+				tk.getImage(BombTank.class.getResource("Images/HtankD.gif")),
+				tk.getImage(BombTank.class.getResource("Images/HtankU.gif")),
 				tk.getImage(BombTank.class.getResource("Images/HtankL.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankR.gif")), 
+				tk.getImage(BombTank.class.getResource("Images/HtankR.gif")),
 				tk.getImage(BombTank.class.getResource("Images/HtankD2.gif")),
 				tk.getImage(BombTank.class.getResource("Images/HtankU2.gif")),
 				tk.getImage(BombTank.class.getResource("Images/HtankL2.gif")),
 				tk.getImage(BombTank.class.getResource("Images/HtankR2.gif")),
-				};
+		};
 
 	}
 
 	public Tank(int x, int y, boolean good) {
-		this.x = x;
-		this.y = y;
-		this.oldX = x;
-		this.oldY = y;
+		this.position = new Position(x, y);
+		this.oldX = position.getX();
+		this.oldY = position.getY();
 		this.good = good;
 	}
 
@@ -54,7 +88,7 @@ public class Tank {
 		this(x, y, good);
 		this.direction = dir;
 		this.tc = tc;
-		this.player=player;
+		this.player = player;
 	}
 
 	public void draw(Graphics g) {
@@ -64,94 +98,91 @@ public class Tank {
 			}
 			return;
 		}
-		//if (good)
-			//new DrawBloodbBar().draw(g); 
-		switch (Kdirection) {
-							
-		case D:
-			if(player==1){	g.drawImage(tankImags[4], x, y, null);
-			}
-			else if(tc.player2 &&player==2){
-				g.drawImage(tankImags[8], x, y, null);
-			}else{
-			g.drawImage(tankImags[0], x, y, null);}
-			break;
+		switch (myDirection) {
 
-		case U:
-			if(player==1){	g.drawImage(tankImags[5], x, y, null);
-			}else if(tc.player2 &&player==2){
-				g.drawImage(tankImags[9], x, y, null);
-			}else{
-			g.drawImage(tankImags[1], x, y, null);}
-			break;
-		case L:if(player==1){	g.drawImage(tankImags[6], x, y, null);
-		}else if(tc.player2 &&player==2){
-			g.drawImage(tankImags[10], x, y, null);
-		}else{
-			g.drawImage(tankImags[2], x, y, null);}
-			break;
+			case D:
+				if(player==1){	g.drawImage(tankImags[4], position.getX(), position.getY(), null);
+				}
+				else if(tc.player2&&player==2){
+					g.drawImage(tankImags[8], position.getX(), position.getY(), null);
+				}else{
+					g.drawImage(tankImags[0], position.getX(), position.getY(), null);}
+				break;
 
-		case R:if(player==1){	g.drawImage(tankImags[7], x, y, null);
-		}else if(tc.player2 &&player==2){
-			g.drawImage(tankImags[11], x, y, null);
-		}else{
-			g.drawImage(tankImags[3], x, y, null);}
-			break;
+			case U:
+				if(player==1){	g.drawImage(tankImags[5], position.getX(), position.getY(), null);
+				}else if(tc.player2&&player==2){
+					g.drawImage(tankImags[9], position.getX(), position.getY(), null);
+				}else{
+					g.drawImage(tankImags[1], position.getX(), position.getY(), null);}
+				break;
+			case L:if(player==1){	g.drawImage(tankImags[6], position.getX(), position.getY(), null);
+			}else if(tc.player2&&player==2){
+				g.drawImage(tankImags[10], position.getX(), position.getY(), null);
+			}else{
+				g.drawImage(tankImags[2], position.getX(), position.getY(), null);}
+				break;
+
+			case R:if(player==1){	g.drawImage(tankImags[7], position.getX(), position.getY(), null);
+			}else if(tc.player2&&player==2){
+				g.drawImage(tankImags[11], position.getX(), position.getY(), null);
+			}else{
+				g.drawImage(tankImags[3], position.getX(), position.getY(), null);}
+				break;
 
 		}
 
-		move();   
+		move();
 	}
 
 	void move() {
+		this.oldX = position.getX();
+		this.oldY = position.getY();
 
-		this.oldX = x;
-		this.oldY = y;
-
-		switch (direction) {  
-		case L:
-			x -= speedX;
-			break;
-		case U:
-			y -= speedY;
-			break;
-		case R:
-			x += speedX;
-			break;
-		case D:
-			y += speedY;
-			break;
-		case STOP:
-			break;
+		switch (direction) {
+			case L:
+				position.setX(position.getX() - speedX);
+				break;
+			case U:
+				position.setY(position.getY() - speedY);
+				break;
+			case R:
+				position.setX(position.getX() + speedX);
+				break;
+			case D:
+				position.setY(position.getY() + speedY);
+				break;
+			case STOP:
+				break;
 		}
 
 		if (this.direction != Direction.STOP) {
-			this.Kdirection = this.direction;
+			this.myDirection = this.direction;
 		}
 
-		if (x < 0)
-			x = 0;
-		if (y < 40)     
-			y = 40;
-		if (x + Tank.width > TankClient.FRAM_WIDTH)
-			x = TankClient.FRAM_WIDTH - Tank.width;
-		if (y + Tank.length > TankClient.FRAM_LENGTH)
-			y = TankClient.FRAM_LENGTH - Tank.length;
+		if (position.getX() < 0)
+			position.setX(0);
+		if (position.getY() < 40)
+			position.setY(40);
+		if (position.getX() + Tank.WIDTH > TankClient.FRAM_WIDTH)
+			x = TankClient.FRAM_WIDTH - Tank.WIDTH;
+		if (position.getY() + Tank.LENGHT > TankClient.FRAM_LENGTH)
+			y = TankClient.FRAM_WIDTH - Tank.LENGHT;
 
 		if (!good) {
 			Direction[] directons = Direction.values();
-			if (step == 0) {                  
-				step = r.nextInt(12) + 3;  
+			if (step == 0) {
+				step = r.nextInt(12) + 3;
 				int mod=r.nextInt(9);
 				if (playertankaround()){
-					if(x==tc.homeTank.x){ if(y>tc.homeTank.y) direction=directons[1];
-					else if (y<tc.homeTank.y) direction=directons[3];
-					}else if(y==tc.homeTank.y){ if(x>tc.homeTank.x) direction=directons[0];
-					else if (x<tc.homeTank.x) direction=directons[2];
+					if(position.getX()==tc.homeTank.x){ if(position.getY()>tc.homeTank.y) direction=directons[1];
+					else if (position.getY()<tc.homeTank.y) direction=directons[3];
+					}else if(position.getY()==tc.homeTank.y){ if(position.getX()>tc.homeTank.x) direction=directons[0];
+					else if (position.getX()<tc.homeTank.x) direction=directons[2];
 					}
 					else{
 						int rn = r.nextInt(directons.length);
-						direction = directons[rn]; 
+						direction = directons[rn];
 					}
 					rate=2;
 				}else if (mod==1){
@@ -159,9 +190,9 @@ public class Tank {
 				}else if(1<mod&&mod<=3){
 					rate=1;
 				}else{
-				int rn = r.nextInt(directons.length);
-				direction = directons[rn]; 
-				rate=1;}    
+					int rn = r.nextInt(directons.length);
+					direction = directons[rn];
+					rate=1;}
 			}
 			step--;
 			if(rate==2){
@@ -172,197 +203,188 @@ public class Tank {
 		}
 	}
 	public boolean playertankaround(){
-		int rx=x-15,ry=y-15;
-		if((x-15)<0) rx=0;
-		if((y-15)<0)ry=0;
+		int rx=position.getX()-15;
+		int ry=position.getY()-15;
+		if((position.getX()-15)<0) rx=0;
+		if((position.getY()-15)<0)ry=0;
 		Rectangle a=new Rectangle(rx, ry,60,60);
 		if (this.live && a.intersects(tc.homeTank.getRect())) {
-		return true;	
+			return true;
 		}
-		return false;	
+		return false;
 	}
-	public int getzone(int x,int y){
-		int tempx=x;
-		int tempy=y;
-		if (tempx<85&&tempy<300) return 11;
-		else if(tempx>85&&tempx<140&&tempy>0&&tempy<100) return 9;
-		else if(tempx>85&&tempx<140&&tempy>254&&tempy<300) return 10;
-		else if(tempx>0&&tempx<200&&tempy>300&&tempy<715) return 12;
-		else if(tempx>140&&tempx<400&&tempy>0&&tempy<150) return 7;
-		else if(tempx>140&&tempx<400&&tempy>210&&tempy<300) return 8;
-		else if(tempx>400&&tempx<500&&tempy>0&&tempy<300) return 6;
-		else if(tempx>500&&tempy>0&&tempy<180) return 5;
-		else if(tempx>500&&tempy>180&&tempy<300) return 4;
-		else if(tempx>520&&tempx<600&&tempy>3000&&tempy<715) return 2;
-		else if(tempx>600&&tempy>300&&tempy<715) return 3;
-	return 1;
-	}
-	public int getdirect(int a,int b){
-		if(b==13){
-			
-		}
+	public int getDirect(int b){
 		return 4;
 	}
-	private void changToOldDir() {  
-		x = oldX;
-		y = oldY;
+	private void changToOldDir() {
+		position.setX(oldX);
+		position.setY(oldY);
 	}
 
-	public void keyPressed(KeyEvent e) {  
+	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (player==1){
-		switch (key) {
-		case KeyEvent.VK_R:  
-			tc.tanks.clear(); 
-			tc.bullets.clear();
-			tc.trees.clear();
-			tc.otherWall.clear();
-			tc.homeWall.clear();
-			tc.metalWall.clear();
-			tc.homeTank.setLive(false);
-			if (tc.tanks.size() == 0) {        
-				for (int i = 0; i < 20; i++) {
-					if (i < 9)                             
-						tc.tanks.add(new Tank(150 + 70 * i, 40, false,
-								Direction.R, tc,0));
-					else if (i < 15)
-						tc.tanks.add(new Tank(700, 140 + 50 * (i -6), false,
-								Direction.D, tc,0));
-					else
-						tc.tanks.add(new Tank(10,  50 * (i - 12), false,
-								Direction.L, tc,0));
-				}
-			}
-			
-			tc.homeTank = new Tank(300, 560, true, Direction.STOP, tc,0);
-			if (!tc.home.isLive()) 
-				tc.home.setLive(true);
-			TankClient abc=new TankClient();
-			if (tc.player2) abc.player2 =true;
-			break;
-		case KeyEvent.VK_D:
-			bR = true;
-			break;
-			
-		case KeyEvent.VK_A:
-			bL = true;
-			break;
-		
-		case KeyEvent.VK_W:  
-			bU = true;
-			break;
-		
-		case KeyEvent.VK_S:
-			bD = true;
-			break;
-		}}
+			switch (key) {
+				case KeyEvent.VK_R:
+					restartGame();
+					break;
+
+				case KeyEvent.VK_D:
+					isMovingRight = true;
+					break;
+
+				case KeyEvent.VK_A:
+					isMovingLeft = true;
+					break;
+
+				case KeyEvent.VK_W:
+					isMovingUp = true;
+					break;
+
+				case KeyEvent.VK_S:
+					isMovingDown = true;
+					break;
+			}}
 		if (player==2){
-		switch(key){
-		case KeyEvent.VK_RIGHT:
-			bR = true;
-			break;
-			
-		case KeyEvent.VK_LEFT:
-			bL = true;
-			break;
-		
-		case KeyEvent.VK_UP: 
-			bU = true;
-			break;
-		
-		case KeyEvent.VK_DOWN:
-			bD = true;
-			break;
-		}
+			switch(key){
+				case KeyEvent.VK_RIGHT:
+					isMovingRight = true;
+					break;
+
+				case KeyEvent.VK_LEFT:
+					isMovingLeft = true;
+					break;
+
+				case KeyEvent.VK_UP:
+					isMovingUp = true;
+					break;
+
+				case KeyEvent.VK_DOWN:
+					isMovingDown = true;
+					break;
+			}
 		}
 		decideDirection();
 	}
 
+	private void initializeEnemyTanks() {
+		for (int i = 0; i < 20; i++) {
+			if (i < 9)
+				tc.tanks.add(new Tank(150 + 70 * i, 40, false, Direction.R, tc, 0));
+			else if (i < 15)
+				tc.tanks.add(new Tank(700, 140 + 50 * (i - 6), false, Direction.D, tc, 0));
+			else
+				tc.tanks.add(new Tank(10, 50 * (i - 12), false, Direction.L, tc, 0));
+		}
+	}
+
+	private void restartGame() {
+		tc.tanks.clear();
+		tc.bullets.clear();
+		tc.trees.clear();
+		tc.otherWall.clear();
+		tc.homeWall.clear();
+		tc.metalWall.clear();
+		tc.homeTank.setLive(false);
+
+		if (tc.tanks.size() == 0) {
+			initializeEnemyTanks();
+		}
+
+		tc.homeTank = new Tank(300, 560, true, Direction.STOP, tc, 0);
+
+		if (!tc.home.isLive())
+			tc.home.setLive(true);
+
+		TankClient abc = new TankClient();
+		if (tc.player2) abc.player2 = true;
+	}
+
 	void decideDirection() {
-		if (!bL && !bU && bR && !bD) 
+		if (!isMovingLeft && !isMovingUp && isMovingRight && !isMovingDown)
 			direction = Direction.R;
 
-		else if (bL && !bU && !bR && !bD) 
+		else if (isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
 			direction = Direction.L;
 
-		else if (!bL && bU && !bR && !bD) 
+		else if (!isMovingLeft && isMovingUp && !isMovingRight && !isMovingDown)
 			direction = Direction.U;
 
-		else if (!bL && !bU && !bR && bD) 
+		else if (!isMovingLeft && !isMovingUp && !isMovingRight && isMovingDown)
 			direction = Direction.D;
 
-		else if (!bL && !bU && !bR && !bD)
-			direction = Direction.STOP; 
+		else if (!isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
+			direction = Direction.STOP;
 	}
 
-	public void keyReleased(KeyEvent e) {  
+	public void keyReleased(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (player==1){
-		switch (key) {
-		
-		case KeyEvent.VK_F:
-			fire();
-			break;
-			
-		case KeyEvent.VK_D:
-			bR = false;
-			break;
-		
-		case KeyEvent.VK_A:
-			bL = false;
-			break;
-		
-		case KeyEvent.VK_W:
-			bU = false;
-			break;
-		
-		case KeyEvent.VK_S:
-			bD = false;
-			break;
-			
-
-		}}
-		if (player==2){
 			switch (key) {
-			
-			case KeyEvent.VK_SLASH:
-				fire();
-				break;
-				
-			case KeyEvent.VK_RIGHT:
-				bR = false;
-				break;
-			
-			case KeyEvent.VK_LEFT:
-				bL = false;
-				break;
-			
-			case KeyEvent.VK_UP:
-				bU = false;
-				break;
-			
-			case KeyEvent.VK_DOWN:
-				bD = false;
-				break;
-				
+
+				case KeyEvent.VK_F:
+					fire();
+					break;
+
+				case KeyEvent.VK_D:
+					isMovingRight = false;
+					break;
+
+				case KeyEvent.VK_A:
+					isMovingLeft = false;
+					break;
+
+				case KeyEvent.VK_W:
+					isMovingUp = false;
+					break;
+
+				case KeyEvent.VK_S:
+					isMovingDown = false;
+					break;
+
 
 			}}
-		decideDirection(); 
+		if (player==2){
+			switch (key) {
+
+				case KeyEvent.VK_SLASH:
+					fire();
+					break;
+
+				case KeyEvent.VK_RIGHT:
+					isMovingRight = false;
+					break;
+
+				case KeyEvent.VK_LEFT:
+					isMovingLeft = false;
+					break;
+
+				case KeyEvent.VK_UP:
+					isMovingUp = false;
+					break;
+
+				case KeyEvent.VK_DOWN:
+					isMovingDown = false;
+					break;
+
+
+			}}
+		decideDirection();
 	}
 
-	public Bullets fire() { 
+	public Bullets fire() {
 		if (!live)
 			return null;
-		int x = this.x + Tank.width / 2 - Bullets.width / 2; 
-		int y = this.y + Tank.length / 2 - Bullets.length / 2;
-		Bullets m = new Bullets(x, y + 2, good, Kdirection, this.tc); 
-		tc.bullets.add(m);                                                
+		int X = position.getX() + Tank.WIDTH / 2 - Bullets.width / 2;
+		int Y = position.getY()  + Tank.LENGHT / 2 - Bullets.length / 2;
+		Bullets m = new Bullets(X, Y + 2, good, myDirection, this.tc);
+		tc.bullets.add(m);
 		return m;
 	}
 
 
 	public Rectangle getRect() {
-		return new Rectangle(x, y, width, length);
+		return new Rectangle(position.getX(), position.getY(), WIDTH, LENGHT);
 	}
 
 	public boolean isLive() {
@@ -377,23 +399,23 @@ public class Tank {
 		return good;
 	}
 
-	public boolean collideWithWall(CommonWall w) {  
+	public boolean collideWithWall(CommonWall w) {
 		if (this.live && this.getRect().intersects(w.getRect())) {
-			 this.changToOldDir();    
+			this.changToOldDir();
 			return true;
 		}
 		return false;
 	}
 
-	public boolean collideWithWall(MetalWall w) { 
+	public boolean collideWithWall(MetalWall w) {
 		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.changToOldDir();     
+			this.changToOldDir();
 			return true;
 		}
 		return false;
 	}
 
-	public boolean collideRiver(River r) {    
+	public boolean collideRiver(River r) {
 		if (this.live && this.getRect().intersects(r.getRect())) {
 			this.changToOldDir();
 			return true;
@@ -401,7 +423,7 @@ public class Tank {
 		return false;
 	}
 
-	public boolean collideHome(Home h) {  
+	public boolean collideHome(Home h) {
 		if (this.live && this.getRect().intersects(h.getRect())) {
 			this.changToOldDir();
 			return true;
@@ -409,16 +431,12 @@ public class Tank {
 		return false;
 	}
 
-	public boolean collideWithTanks(java.util.List<Tank> tanks) {
-		for (int i = 0; i < tanks.size(); i++) {
-			Tank t = tanks.get(i);
-			if (this != t) {
-				if (this.live && t.isLive()
-						&& this.getRect().intersects(t.getRect())) {
-					this.changToOldDir();
-					t.changToOldDir();
-					return true;
-				}
+	public boolean collideWithTanks(List<Tank> tanks) {
+		for (Tank t : tanks) {
+			if (this != t && this.live && t.isLive() && this.getRect().intersects(t.getRect())) {
+				this.changToOldDir();
+				t.changToOldDir();
+				return true;
 			}
 		}
 		return false;
@@ -433,21 +451,10 @@ public class Tank {
 		this.life = life;
 	}
 
-	private class DrawBloodbBar {
-		public void draw(Graphics g) {
-			Color c = g.getColor();
-			g.setColor(Color.RED);
-			g.drawRect(375, 585, width, 10);
-			int w = width * life / 200;
-			g.fillRect(375, 585, w, 10);
-			g.setColor(c);
-		}
-	}
-
 	public boolean eat(GetBlood b) {
 		if (this.live && b.isLive() && this.getRect().intersects(b.getRect())) {
 			if(this.life<=100)
-			this.life = this.life+100;      
+				this.life = this.life+100;
 			else
 				this.life = 200;
 			b.setLive(false);
@@ -463,4 +470,5 @@ public class Tank {
 	public int getY() {
 		return y;
 	}
+
 }
