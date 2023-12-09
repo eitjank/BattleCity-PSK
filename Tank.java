@@ -108,7 +108,7 @@ public class Tank {
 			case D:
 				if(player==1){	g.drawImage(tankImags[4], x, y, null);
 				}
-				else if(tc.Player2&&player==2){
+				else if(tc.player2&&player==2){
 					g.drawImage(tankImags[8], x, y, null);
 				}else{
 					g.drawImage(tankImags[0], x, y, null);}
@@ -116,20 +116,20 @@ public class Tank {
 
 			case U:
 				if(player==1){	g.drawImage(tankImags[5], x, y, null);
-				}else if(tc.Player2&&player==2){
+				}else if(tc.player2&&player==2){
 					g.drawImage(tankImags[9], x, y, null);
 				}else{
 					g.drawImage(tankImags[1], x, y, null);}
 				break;
 			case L:if(player==1){	g.drawImage(tankImags[6], x, y, null);
-			}else if(tc.Player2&&player==2){
+			}else if(tc.player2&&player==2){
 				g.drawImage(tankImags[10], x, y, null);
 			}else{
 				g.drawImage(tankImags[2], x, y, null);}
 				break;
 
 			case R:if(player==1){	g.drawImage(tankImags[7], x, y, null);
-			}else if(tc.Player2&&player==2){
+			}else if(tc.player2&&player==2){
 				g.drawImage(tankImags[11], x, y, null);
 			}else{
 				g.drawImage(tankImags[3], x, y, null);}
@@ -170,10 +170,10 @@ public class Tank {
 			x = 0;
 		if (y < 40)
 			y = 40;
-		if (x + Tank.WIDTH > TankClient.Fram_width)
-			x = TankClient.Fram_width - Tank.WIDTH;
-		if (y + Tank.LENGHT > TankClient.Fram_length)
-			y = TankClient.Fram_length - Tank.LENGHT;
+		if (x + Tank.WIDTH > TankClient.FRAM_WIDTH)
+			x = TankClient.FRAM_WIDTH - Tank.WIDTH;
+		if (y + Tank.LENGHT > TankClient.FRAM_LENGTH)
+			y = TankClient.FRAM_LENGTH - Tank.LENGHT;
 
 		if (!good) {
 			Direction[] directons = Direction.values();
@@ -303,7 +303,7 @@ public class Tank {
 			tc.home.setLive(true);
 
 		TankClient abc = new TankClient();
-		if (tc.Player2) abc.Player2 = true;
+		if (tc.player2) abc.player2 = true;
 	}
 
 	void decideDirection() {
