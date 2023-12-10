@@ -4,50 +4,22 @@ import java.util.List;
 import java.util.Map;
 
 public class Bullets {
-	public static  int speedX = 12;
-	public static  int speedY = 12;
+	public static int speedX = 12;
+	public static int speedY = 12;
 
 	public static final int width = 10;
 	public static final int length = 10;
 
 	private int x, y;
-	Direction direction;
+	private Direction direction;
 
 	private boolean good;
 	private boolean live = true;
 
 	private TankClient tc;
+	private static Map<String, Image> imgs = new HashMap<String, Image>();
 
-	private static Toolkit tk = Toolkit.getDefaultToolkit();
-	private static Image[] bulletImages = null;
-	private static Map<String, Image> imgs = new HashMap<String, Image>(); 
-	static {
-		bulletImages = new Image[] {
-				tk.getImage(Bullets.class.getClassLoader().getResource(
-						"images/bulletL.gif")),
-
-				tk.getImage(Bullets.class.getClassLoader().getResource(
-						"images/bulletU.gif")),
-
-				tk.getImage(Bullets.class.getClassLoader().getResource(
-						"images/bulletR.gif")),
-
-				tk.getImage(Bullets.class.getClassLoader().getResource(
-						"images/bulletD.gif")),
-
-		};
-
-		imgs.put("L", bulletImages[0]); 
-
-		imgs.put("U", bulletImages[1]);
-
-		imgs.put("R", bulletImages[2]);
-
-		imgs.put("D", bulletImages[3]);
-
-	}
-
-	public Bullets(int x, int y, Direction dir) { 
+	public Bullets(int x, int y, Direction dir) {
 		this.x = x;
 		this.y = y;
 		this.direction = dir;
@@ -60,30 +32,28 @@ public class Bullets {
 	}
 
 	private void move() {
-
 		switch (direction) {
-		case L:
-			x -= speedX;
-			break;
+			case L:
+				x -= speedX;
+				break;
 
-		case U:
-			y -= speedY;
-			break;
+			case U:
+				y -= speedY;
+				break;
 
-		case R:
-			x += speedX; 
-			break;
+			case R:
+				x += speedX;
+				break;
 
-		case D:
-			y += speedY;
-			break;
+			case D:
+				y += speedY;
+				break;
 
-		case STOP:
-			break;
+			case STOP:
+				break;
 		}
 
-		if (x < 0 || y < 0 || x > TankClient.FRAME_WIDTH
-				|| y > TankClient.FRAME_LENGTH) {
+		if (x < 0 || y < 0 || x > TankClient.FRAME_WIDTH || y > TankClient.FRAME_LENGTH) {
 			live = false;
 		}
 	}
@@ -95,28 +65,30 @@ public class Bullets {
 		}
 
 		switch (direction) {
-		case L:
-			g.drawImage(imgs.get("L"), x, y, null);
-			break;
+			case L:
+				g.drawImage(imgs.get("L"), x, y, null);
+				break;
 
-		case U:
-			g.drawImage(imgs.get("U"), x, y, null);
-			break;
+			case U:
+				g.drawImage(imgs.get("U"), x, y, null);
+				break;
 
-		case R:
-			g.drawImage(imgs.get("R"), x, y, null);
-			break;
+			case R:
+				g.drawImage(imgs.get("R"), x, y, null);
+				break;
 
-		case D:
-			g.drawImage(imgs.get("D"), x, y, null);
-			break;
-
+			case D:
+				g.drawImage(imgs.get("D"), x, y, null);
+				break;
 		}
 
-		move(); 
+		Image bulletImage = BulletImageLoader.getBulletImage(direction.toString());
+		g.drawImage(bulletImage, x, y, null);
+
+		move();
 	}
 
-	public boolean isLive() { 
+	public boolean isLive() {
 		return live;
 	}
 
@@ -124,69 +96,10 @@ public class Bullets {
 		return new Rectangle(x, y, width, length);
 	}
 
-	public boolean hitTanks(List<Tank> tanks) {
-		for (int i = 0; i < tanks.size(); i++) {
-			if (hitTank(tanks.get(i))) {
-				return true;
-			}
-		}
-		return false;
+	public boolean isGood() {
+		return good;
 	}
-
-	public boolean hitTank(Tank t) { 
-
-		if (this.live && this.getRect().intersects(t.getRect()) && t.isLive()
-				&& this.good != t.isGood()) {
-
-			BombTank e = new BombTank(t.getPos().getX(), t.getPos().getY(), tc);
-			tc.bombTanks.add(e);
-			if (t.isGood()) {
-				t.setLife(t.getLife() - 50); 
-				if (t.getLife() <= 0)
-					t.setLive(false); 
-			} else {
-				t.setLive(false); 
-			}
-
-			this.live = false;
-
-			return true; 
-		}
-		return false;
+	public void setLive(boolean live) {
+		this.live = live;
 	}
-
-	public boolean hitWall(CommonWall w) { 
-		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.live = false;
-			this.tc.otherWall.remove(w); 
-			this.tc.homeWall.remove(w);
-			return true;
-		}
-		return false;
-	}
-	public boolean hitBullet(Bullets w){
-		if (this.live && this.getRect().intersects(w.getRect())){
-			this.live=false;
-			this.tc.bullets.remove(w);
-			return true;
-		}
-		return false;
-	}
-	public boolean hitWall(MetalWall w) { 
-		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.live = false;
-			return true;
-		}
-		return false;
-	}
-
-	public boolean hitHome() { 
-		if (this.live && this.getRect().intersects(tc.home.getRect())) {
-			this.live = false;
-			this.tc.home.setLive(false); 
-			return true;
-		}
-		return false;
-	}
-
 }

@@ -9,6 +9,8 @@ public class TankClient extends Frame implements ActionListener {
     /**
      *
      */
+
+    private KeyHandler keyHandler;
     private static final long serialVersionUID = 1L;
     public static final int FRAME_WIDTH = 800;
     public static final int FRAME_LENGTH = 600;
@@ -31,7 +33,7 @@ public class TankClient extends Frame implements ActionListener {
     private MenuItem addPlayer2MenuItem = null;
     private MenuItem joinOthersGameMenuItem = null;
     private Image screenImage = null;
-
+    private GameInitializer gameInitializer;
     Tank homeTank = new Tank(300, 560, true, Direction.STOP, this, 1);
     Tank homeTank2 = new Tank(449, 560, true, Direction.STOP, this, 2);
     Boolean player2 = false;
@@ -138,31 +140,29 @@ public class TankClient extends Frame implements ActionListener {
             homeTank2.eat(blood);
         }
 
+        BulletColisionHandler handler = new BulletColisionHandler(this);
+
         for (int i = 0; i < bullets.size(); i++) {
             Bullets m = bullets.get(i);
-            m.hitTanks(tanks);
-            m.hitTank(homeTank);
-            m.hitTank(homeTank2);
-            m.hitHome();
+            handler.handleHitTanks(tanks, m);
+            handler.handleHitHome(home, m);
+
             for (int j = 0; j < bullets.size(); j++) {
                 if (i == j) continue;
                 Bullets bts = bullets.get(j);
-                m.hitBullet(bts);
+                handler.handleHitBullet(bts, m);
             }
+
             for (int j = 0; j < metalWall.size(); j++) {
                 MetalWall mw = metalWall.get(j);
-                m.hitWall(mw);
+                handler.handleHitMetalWall(mw, m);
             }
 
             for (int j = 0; j < otherWall.size(); j++) {
                 CommonWall w = otherWall.get(j);
-                m.hitWall(w);
+                handler.handleHitCommonWall(w, m);
             }
 
-            for (int j = 0; j < homeWall.size(); j++) {
-                CommonWall cw = homeWall.get(j);
-                m.hitWall(cw);
-            }
             m.draw(graphics);
         }
 
@@ -265,13 +265,12 @@ public class TankClient extends Frame implements ActionListener {
         this.setMenuBar(menu);
         this.setVisible(true);
 
-        initializeHomeWalls();
-        initializeOtherWalls();
-        initializeMetalWalls();
-        initializeTrees();
-        initializeRiver();
-        initializeTanks();
-        initializeFrame();
+        gameInitializer = new GameInitializer(this);
+        gameInitializer.initializeGame();
+
+        KeyHandler keyHandler = new KeyHandler(homeTank, homeTank2, this);
+        this.addKeyListener(keyHandler);
+
     }
 
     private void initializeFrame() {
@@ -288,95 +287,7 @@ public class TankClient extends Frame implements ActionListener {
         this.setBackground(Color.GREEN);
         this.setVisible(true);
 
-        this.addKeyListener(new KeyMonitor());
         new Thread(new PaintThread()).start();
-    }
-
-    private void initializeTanks() {
-        for (int i = 0; i < 20; i++) {
-            int tankX1 = 150 + 70 * i;
-            int tankX2 = 700;
-            int tankY1 = 40;
-            int tankY2 = 140 + 50 * (i - 6);
-            int tankY3 = 50 * (i - 12);
-
-            if (i < 9)
-                tanks.add(new Tank(tankX1, tankY1, false, Direction.D, this, 0));
-            else if (i < 15)
-                tanks.add(new Tank(tankX2, tankY2, false, Direction.D, this, 0));
-            else
-                tanks.add(new Tank(10, tankY3, false, Direction.D, this, 0));
-        }
-    }
-
-    private void initializeRiver() {
-        theRiver.add(new River(85, 100));
-    }
-
-    private void initializeTrees() {
-        for (int i = 0; i < 4; i++) {
-            int treeX = 30 * i;
-            int treeY = 360;
-
-            trees.add(new Tree(treeX, treeY, this));
-            trees.add(new Tree(220 + treeX, treeY, this));
-            trees.add(new Tree(440 + treeX, treeY, this));
-            trees.add(new Tree(660 + treeX, treeY, this));
-        }
-    }
-
-    private void initializeMetalWalls() {
-        for (int i = 0; i < 20; i++) {
-            int metalWallX1 = 140 + 30 * i;
-            int metalWallX2 = 600;
-            int metalWallY1 = 150;
-            int metalWallY2 = 400 + 20 * i;
-            int metalWallY3 = 180;
-
-            if (i < 10) {
-                metalWall.add(new MetalWall(metalWallX1, metalWallY1, this));
-                metalWall.add(new MetalWall(metalWallX2, metalWallY2, this));
-            } else if (i < 20)
-                metalWall.add(new MetalWall(metalWallX1, metalWallY3, this));
-        }
-    }
-
-    private void initializeOtherWalls() {
-        for (int i = 0; i < 32; i++) {
-            int otherWallX1 = 200 + 21 * i;
-            int otherWallX2 = 500 + 21 * i;
-            int otherWallY1 = 300;
-            int otherWallY2 = 180;
-            int otherWallY3 = 400;
-
-            if (i < 16) {
-                otherWall.add(new CommonWall(otherWallX1, otherWallY1, this));
-                otherWall.add(new CommonWall(otherWallX2, otherWallY2, this));
-                otherWall.add(new CommonWall(200, otherWallY3 + 21 * i, this));
-                otherWall.add(new CommonWall(500, otherWallY3 + 21 * i, this));
-            } else if (i < 32) {
-                otherWall.add(new CommonWall(otherWallX1, otherWallY1 + 20, this));
-                otherWall.add(new CommonWall(otherWallX2, otherWallY2 + 20, this));
-                otherWall.add(new CommonWall(222, otherWallY3 + 21 * (i - 16), this));
-                otherWall.add(new CommonWall(522, otherWallY3 + 21 * (i - 16), this));
-            }
-        }
-    }
-
-    private void initializeHomeWalls() {
-        int homeWallX = 350;
-        int homeWallY1 = 580;
-        int homeWallY2 = 517;
-        int homeWallY3 = 538;
-
-        for (int i = 0; i < 10; i++) {
-            if (i < 4)
-                homeWall.add(new CommonWall(homeWallX, homeWallY1 - 21 * i, this));
-            else if (i < 7)
-                homeWall.add(new CommonWall(372 + 22 * (i - 4), homeWallY2, this));
-            else
-                homeWall.add(new CommonWall(416, homeWallY3 + (i - 7) * 21, this));
-        }
     }
 
     private void addMenuListener(MenuItem jmi1, String command) {
@@ -452,20 +363,6 @@ public class TankClient extends Frame implements ActionListener {
         }
     }
 
-    private class KeyMonitor extends KeyAdapter {
-
-        public void keyReleased(KeyEvent e) {
-            homeTank.keyReleased(e);
-            homeTank2.keyReleased(e);
-        }
-
-        public void keyPressed(KeyEvent e) {
-            homeTank.keyPressed(e);
-            homeTank2.keyPressed(e);
-        }
-
-    }
-
     public void actionPerformed(ActionEvent e) {
 
         if (e.getActionCommand().equals("NewGame")) {
@@ -507,22 +404,23 @@ public class TankClient extends Frame implements ActionListener {
 
             }
 
-		} else if(e.getActionCommand().equals("Player2")){
-			printable = false;
-			Object[] options = { "Confirm", "Cancel" };
-			int response = JOptionPane.showOptionDialog(this, "Confirm to add player2?", "",
-					JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-					options, options[0]);
-			if (response == 0) {
-				printable = true;
-				this.dispose();
-				TankClient Player2add=new TankClient();
-				Player2add.player2=true;
-			} else {
-				printable = true;
-				new Thread(new PaintThread()).start();
-			}
-		}
+        } else if(e.getActionCommand().equals("Player2")){
+            printable = false;
+            Object[] options = { "Confirm", "Cancel" };
+            int response = JOptionPane.showOptionDialog(this, "Confirm to add player2?", "",
+                    JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    options, options[0]);
+            if (response == 0) {
+                printable = true;
+                this.dispose();
+                TankClient player2add = new TankClient();
+                player2add.player2 = true;
+                keyHandler.setTankClient(player2add);
+            } else {
+                printable = true;
+                new Thread(new PaintThread()).start();
+            }
+        }
 		else if (e.getActionCommand().equals("help")) {
 			printable = false;
 			JOptionPane.showMessageDialog(null, "Use WSAD to control Player1's direction, use F to fire and restart with pressing R\nUse diection key to Control Player2, use slash to fire",
@@ -572,4 +470,30 @@ public class TankClient extends Frame implements ActionListener {
 		}
 
 	}
+
+    public List<Tank> getTanks() {
+        return tanks;
+    }
+
+    public List<Tree> getTrees() {
+        return trees;
+    }
+
+    public List<CommonWall> getHomeWall() {
+        return homeWall;
+    }
+
+    public List<CommonWall> getOtherWall() {
+        return otherWall;
+    }
+
+    public List<MetalWall> getMetalWall() {
+        return metalWall;
+    }
+    public List<River> getTheRiver() {
+        return theRiver;
+    }
+    public boolean isPrintable() {
+        return printable;
+    }
 }

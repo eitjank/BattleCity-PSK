@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.List;
 
 public class Tank extends DestructibleObject {
+	private CollisionHandler collisionHandler = new CollisionHandler();
 	private static final int TANK_LENGTH = 35;
 	private static final int TANK_WIDTH = 35;
 	private static int speedX = 6;
@@ -27,12 +28,14 @@ public class Tank extends DestructibleObject {
 	private boolean isMovingUp = false;
 	private boolean isMovingRight = false;
 	private boolean isMovingDown = false;
+	private TankHandler tankHandler;
 
 	public Tank(int x, int y, boolean good) {
 		super(x, y, TANK_WIDTH, TANK_LENGTH);
 		this.oldX = this.pos.getX();
 		this.oldY = this.pos.getY();
 		this.good = good;
+		tankHandler = new TankHandler(this);
 	}
 
 	public Tank(int x, int y, boolean good, Direction dir, TankClient tc, int player) {
@@ -56,24 +59,13 @@ public class Tank extends DestructibleObject {
 		}
 		commandMap.put(KeyEvent.VK_R, new RestartGameCommand(this));
 	}
-	public int getSpeedX() {
-		return speedX;
-	}
 
 	public static void setSpeedX(int speedX) {
 		Tank.speedX = speedX;
 	}
 
-	public  int getSpeedY() {
-		return speedY;
-	}
-
 	public static void setSpeedY(int speedY) {
 		Tank.speedY = speedY;
-	}
-
-	public  int getCount() {
-		return count;
 	}
 
 	public static void setCount(int count) {
@@ -133,62 +125,22 @@ public class Tank extends DestructibleObject {
 			this.myDirection = this.direction;
 		}
 
-		handleBoundaries();
+		tankHandler.handleBoundaries();
 
 		if (!good) {
 			Direction[] directions = Direction.values();
 			if (step == 0) {
 				step = r.nextInt(12) + 3;
-				int mod=r.nextInt(9);
-				if (playerTankAround()){
-					handlePlayerTankAround(directions);
-				}else handleNoPlayerTankAround(mod, directions);
+				int mod = r.nextInt(9);
+				if (playerTankAround()) {
+					tankHandler.handlePlayerTankAround(directions);
+				} else {
+					tankHandler.handleNoPlayerTankAround(mod, directions);
+				}
 			}
 			step--;
-			handleRate();
+			tankHandler.handleRate();
 		}
-	}
-
-	private void handlePlayerTankAround(Direction[] directions) {
-		if(this.pos.getX()==tc.homeTank.getPos().getX()){
-			if(this.pos.getY()>tc.homeTank.getPos().getY()) direction= directions[1];
-			else if (this.pos.getY()<tc.homeTank.getPos().getY()) direction= directions[3];
-		}else if(this.pos.getY()==tc.homeTank.getPos().getY()){
-			if(this.pos.getX()>tc.homeTank.getPos().getX()) direction= directions[0];
-			else if (this.pos.getX()<tc.homeTank.getPos().getX()) direction= directions[2];
-		}
-		else{
-			int rn = r.nextInt(directions.length);
-			direction = directions[rn];
-		}
-		rate=2;
-	}
-
-	private void handleNoPlayerTankAround(int mod, Direction[] directions) {
-        if (mod != 1 && (1 >= mod || mod > 3)) {
-            int rn = r.nextInt(directions.length);
-            direction = directions[rn];
-        }
-        rate=1;
-    }
-
-	private void handleRate() {
-		if(rate==2){
-			if (r.nextInt(40) > 35)
-				this.fire();
-		}else if (r.nextInt(40) > 38)
-			this.fire();
-	}
-
-	private void handleBoundaries() {
-		if (this.pos.getX() < 0)
-			this.pos.setX(0);
-		if (this.pos.getY() < 40)
-			this.pos.setY(40);
-		if (this.pos.getX() + Tank.TANK_WIDTH > TankClient.FRAME_WIDTH)
-			this.pos.setX(TankClient.FRAME_WIDTH - Tank.TANK_WIDTH);
-		if (this.pos.getY() + Tank.TANK_LENGTH > TankClient.FRAME_LENGTH)
-			this.pos.setY(TankClient.FRAME_WIDTH - Tank.TANK_LENGTH);
 	}
 
 	public boolean playerTankAround(){
@@ -292,47 +244,28 @@ public class Tank extends DestructibleObject {
 		return good;
 	}
 	public boolean collideWithObject(GameObject gameObject) {
-		if (this.live && this.getRect().intersects(gameObject.getRect())) {
-			this.changToOldDir();
-			return true;
-		}
-		return false;
-	}
-	public boolean collideWithWall(CommonWall w) {
-		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.changToOldDir();
-			return true;
-		}
-		return false;
+		return collisionHandler.handleCollisionsWithObject(this, gameObject);
 	}
 
-	public boolean collideWithWall(MetalWall w) {
-		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.changToOldDir();
-			return true;
-		}
-		return false;
+	public boolean collideWithWall(CommonWall wall) {
+		return collisionHandler.handleCollisionsWithWall(this, wall);
 	}
 
-	public boolean collideHome(Home h) {
-		if (this.live && this.getRect().intersects(h.getRect())) {
-			this.changToOldDir();
-			return true;
-		}
-		return false;
+	public boolean collideWithWall(MetalWall wall) {
+		return collisionHandler.handleCollisionsWithWall(this, wall);
+	}
+
+	public boolean collideHome(Home home) {
+		return collisionHandler.handleCollisionsWithHome(this, home);
 	}
 
 	public boolean collideWithTanks(List<Tank> tanks) {
-		for (Tank t : tanks) {
-			if (this != t && this.live && t.isLive() && this.getRect().intersects(t.getRect())) {
-				this.changToOldDir();
-				t.changToOldDir();
-				return true;
-			}
-		}
-		return false;
+		return collisionHandler.handleCollisionsWithTanks(this, tanks);
 	}
 
+	public void handleCollision() {
+		changToOldDir();
+	}
 
 	public int getLife() {
 		return life;
@@ -353,4 +286,27 @@ public class Tank extends DestructibleObject {
 		}
 		return false;
 	}
+	public TankClient getTc() {
+		return tc;
+	}
+
+	public void setDirection(Direction direction) {
+		this.direction = direction;
+	}
+
+	public void setRate(int rate) {
+		this.rate = rate;
+	}
+
+	public static int getTankWidth() {
+		return TANK_WIDTH;
+	}
+
+	public static int getTankLength() {
+		return TANK_LENGTH;
+	}
+	public int getRate() {
+		return rate;
+	}
+
 }
