@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.List;
 
 public class Tank extends DestructibleObject {
-	private CollisionHandler collisionHandler = new CollisionHandler();
 	private static final int TANK_LENGTH = 35;
 	private static final int TANK_WIDTH = 35;
 	private static int speedX = 6;
@@ -15,7 +14,6 @@ public class Tank extends DestructibleObject {
 	private Direction myDirection = Direction.U;
 	TankClient tc;
 	private int player=0;
-	private final java.util.Map<Integer, Command> commandMap = new HashMap<>();
 	private boolean good;
 	private int oldX;
 	private int oldY;
@@ -23,11 +21,6 @@ public class Tank extends DestructibleObject {
 	private int rate=1;
 	private static final Random r = new Random();
 	private int step = r.nextInt(10)+5 ;
-
-	private boolean isMovingLeft = false;
-	private boolean isMovingUp = false;
-	private boolean isMovingRight = false;
-	private boolean isMovingDown = false;
 	private TankHandler tankHandler;
 
 	public Tank(int x, int y, boolean good) {
@@ -43,21 +36,6 @@ public class Tank extends DestructibleObject {
 		this.direction = dir;
 		this.tc = tc;
 		this.player = player;
-		if(player == 1) {
-			commandMap.put(KeyEvent.VK_W, new MoveUpCommand(this));
-			commandMap.put(KeyEvent.VK_S, new MoveDownCommand(this));
-			commandMap.put(KeyEvent.VK_A, new MoveLeftCommand(this));
-			commandMap.put(KeyEvent.VK_D, new MoveRightCommand(this));
-			commandMap.put(KeyEvent.VK_F, new FireCommand(this));
-		}
-		else if(player == 2) {
-			commandMap.put(KeyEvent.VK_UP, new MoveUpCommand(this));
-			commandMap.put(KeyEvent.VK_DOWN, new MoveDownCommand(this));
-			commandMap.put(KeyEvent.VK_LEFT, new MoveLeftCommand(this));
-			commandMap.put(KeyEvent.VK_RIGHT, new MoveRightCommand(this));
-			commandMap.put(KeyEvent.VK_SLASH, new FireCommand(this));
-		}
-		commandMap.put(KeyEvent.VK_R, new RestartGameCommand(this));
 	}
 
 	public static void setSpeedX(int speedX) {
@@ -70,22 +48,6 @@ public class Tank extends DestructibleObject {
 
 	public static void setCount(int count) {
 		Tank.count = count;
-	}
-
-	public void setMovingLeft(boolean movingLeft) {
-		isMovingLeft = movingLeft;
-	}
-
-	public void setMovingUp(boolean movingUp) {
-		isMovingUp = movingUp;
-	}
-
-	public void setMovingRight(boolean movingRight) {
-		isMovingRight = movingRight;
-	}
-
-	public void setMovingDown(boolean movingDown) {
-		isMovingDown = movingDown;
 	}
 
 	public void draw(Graphics g) {
@@ -156,14 +118,6 @@ public class Tank extends DestructibleObject {
 		this.pos.setY(oldY);
 	}
 
-	public void keyPressed(KeyEvent e) {
-		int key = e.getKeyCode();
-		if (commandMap.containsKey(key)) {
-			commandMap.get(key).execute();
-		}
-		decideDirection();
-	}
-
 	private void initializeEnemyTanks() {
 		for (int i = 0; i < 20; i++) {
 			if (i < 9)
@@ -197,31 +151,6 @@ public class Tank extends DestructibleObject {
 		if (tc.player2) abc.player2 = true;
 	}
 
-	void decideDirection() {
-		if (!isMovingLeft && !isMovingUp && isMovingRight && !isMovingDown)
-			direction = Direction.R;
-
-		else if (isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
-			direction = Direction.L;
-
-		else if (!isMovingLeft && isMovingUp && !isMovingRight && !isMovingDown)
-			direction = Direction.U;
-
-		else if (!isMovingLeft && !isMovingUp && !isMovingRight && isMovingDown)
-			direction = Direction.D;
-
-		else if (!isMovingLeft && !isMovingUp && !isMovingRight && !isMovingDown)
-			direction = Direction.STOP;
-	}
-
-	public void keyReleased(KeyEvent e) {
-		int key = e.getKeyCode();
-		if (commandMap.containsKey(key)) {
-			commandMap.get(key).stopExecution();
-		}
-		decideDirection();
-	}
-
 	public Bullets fire() {
 		if (!live)
 			return null;
@@ -236,11 +165,22 @@ public class Tank extends DestructibleObject {
 		return good;
 	}
 	public boolean collideWithObject(GameObject gameObject) {
-		return collisionHandler.handleCollisionsWithObject(this, gameObject);
+		if (this.live && this.getRect().intersects(gameObject.getRect())) {
+			handleCollision();
+			return true;
+		}
+		return false;
 	}
 
 	public boolean collideWithTanks(List<Tank> tanks) {
-		return collisionHandler.handleCollisionsWithTanks(this, tanks);
+		for (Tank t : tanks) {
+			if (this != t && this.isLive() && t.isLive() && this.getRect().intersects(t.getRect())) {
+				handleCollision();
+				t.handleCollision();
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void handleCollision() {

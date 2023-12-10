@@ -268,7 +268,7 @@ public class TankClient extends Frame implements ActionListener {
         gameInitializer = new GameInitializer(this);
         gameInitializer.initializeGame();
 
-        KeyHandler keyHandler = new KeyHandler(homeTank, homeTank2, this);
+        KeyHandler keyHandler = new KeyHandler(homeTank, homeTank2);
         this.addKeyListener(keyHandler);
 
     }

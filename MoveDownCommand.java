@@ -5,10 +5,10 @@ public class MoveDownCommand implements Command{
     }
     @Override
     public void execute(){
-        tank.setMovingDown(true);
+        tank.setDirection(Direction.D);
     }
     @Override
     public void stopExecution(){
-        tank.setMovingDown(false);
+        tank.setDirection(Direction.STOP);
     }
 }

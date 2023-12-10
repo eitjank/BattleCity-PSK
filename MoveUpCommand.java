@@ -5,10 +5,10 @@ public class MoveUpCommand implements Command{
     }
     @Override
     public void execute(){
-        tank.setMovingUp(true);
+        tank.setDirection(Direction.U);
     }
     @Override
     public void stopExecution(){
-        tank.setMovingUp(false);
+        tank.setDirection(Direction.STOP);
     }
 }

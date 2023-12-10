@@ -110,15 +110,15 @@ public class GameInitializer {
             int otherWallY3 = 400;
 
             if (i < 16) {
-                otherWall.add(new CommonWall(otherWallX1, otherWallY1, tankClient));
-                otherWall.add(new CommonWall(otherWallX2, otherWallY2, tankClient));
-                otherWall.add(new CommonWall(200, otherWallY3 + 21 * i, tankClient));
-                otherWall.add(new CommonWall(500, otherWallY3 + 21 * i, tankClient));
+                otherWall.add(new CommonWall(otherWallX1, otherWallY1));
+                otherWall.add(new CommonWall(otherWallX2, otherWallY2));
+                otherWall.add(new CommonWall(200, otherWallY3 + 21 * i));
+                otherWall.add(new CommonWall(500, otherWallY3 + 21 * i));
             } else if (i < 32) {
-                otherWall.add(new CommonWall(otherWallX1, otherWallY1 + 20, tankClient));
-                otherWall.add(new CommonWall(otherWallX2, otherWallY2 + 20, tankClient));
-                otherWall.add(new CommonWall(222, otherWallY3 + 21 * (i - 16), tankClient));
-                otherWall.add(new CommonWall(522, otherWallY3 + 21 * (i - 16), tankClient));
+                otherWall.add(new CommonWall(otherWallX1, otherWallY1 + 20));
+                otherWall.add(new CommonWall(otherWallX2, otherWallY2 + 20));
+                otherWall.add(new CommonWall(222, otherWallY3 + 21 * (i - 16)));
+                otherWall.add(new CommonWall(522, otherWallY3 + 21 * (i - 16)));
             }
         }
     }
@@ -132,11 +132,11 @@ public class GameInitializer {
 
         for (int i = 0; i < 10; i++) {
             if (i < 4)
-                homeWall.add(new CommonWall(homeWallX, homeWallY1 - 21 * i, tankClient));
+                homeWall.add(new CommonWall(homeWallX, homeWallY1 - 21 * i));
             else if (i < 7)
-                homeWall.add(new CommonWall(372 + 22 * (i - 4), homeWallY2, tankClient));
+                homeWall.add(new CommonWall(372 + 22 * (i - 4), homeWallY2));
             else
-                homeWall.add(new CommonWall(416, homeWallY3 + (i - 7) * 21, tankClient));
+                homeWall.add(new CommonWall(416, homeWallY3 + (i - 7) * 21));
         }
     }
 

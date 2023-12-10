@@ -5,10 +5,10 @@ public class MoveLeftCommand implements Command{
     }
     @Override
     public void execute(){
-        tank.setMovingLeft(true);
+        tank.setDirection(Direction.L);
     }
     @Override
     public void stopExecution(){
-        tank.setMovingLeft(false);
+        tank.setDirection(Direction.STOP);
     }
 }

@@ -10,7 +10,7 @@ public class CommonWall extends GameObject{
 		tk.getImage(CommonWall.class.getResource("Images/commonWall.gif")), };
 	}
 
-	public CommonWall(int x, int y, TankClient tankClient) {
+	public CommonWall(int x, int y) {
 		super(x, y, COMMON_WALL_WIDTH, COMMON_WALL_LENGTH);
 	}
 
