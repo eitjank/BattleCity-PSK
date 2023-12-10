@@ -1,10 +1,10 @@
 import java.util.List;
 
-public class BulletColisionHandler {
+public class BulletCollisionHandler {
 
     private TankClient tc;
 
-    public BulletColisionHandler(TankClient tc) {
+    public BulletCollisionHandler(TankClient tc) {
         this.tc = tc;
     }
 

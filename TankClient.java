@@ -140,7 +140,7 @@ public class TankClient extends Frame implements ActionListener {
             homeTank2.eat(blood);
         }
 
-        BulletColisionHandler handler = new BulletColisionHandler(this);
+        BulletCollisionHandler handler = new BulletCollisionHandler(this);
 
         for (int i = 0; i < bullets.size(); i++) {
             Bullets m = bullets.get(i);
@@ -171,17 +171,17 @@ public class TankClient extends Frame implements ActionListener {
 
             for (int j = 0; j < homeWall.size(); j++) {
                 CommonWall cw = homeWall.get(j);
-                t.collideWithWall(cw);
+                t.collideWithObject(cw);
                 cw.draw(graphics);
             }
             for (int j = 0; j < otherWall.size(); j++) {
                 CommonWall cw = otherWall.get(j);
-                t.collideWithWall(cw);
+                t.collideWithObject(cw);
                 cw.draw(graphics);
             }
             for (int j = 0; j < metalWall.size(); j++) {
                 MetalWall mw = metalWall.get(j);
-                t.collideWithWall(mw);
+                t.collideWithObject(mw);
                 mw.draw(graphics);
             }
             for (int j = 0; j < theRiver.size(); j++) {
@@ -191,7 +191,7 @@ public class TankClient extends Frame implements ActionListener {
             }
 
             t.collideWithTanks(tanks);
-            t.collideHome(home);
+            t.collideWithObject(home);
 
             t.draw(graphics);
         }
@@ -217,30 +217,30 @@ public class TankClient extends Frame implements ActionListener {
         }
 
         homeTank.collideWithTanks(tanks);
-        homeTank.collideHome(home);
+        homeTank.collideWithObject(home);
         if (player2) {
             homeTank2.collideWithTanks(tanks);
-            homeTank2.collideHome(home);
+            homeTank2.collideWithObject(home);
         }
 
         for (int i = 0; i < metalWall.size(); i++) {
             MetalWall w = metalWall.get(i);
-            homeTank.collideWithWall(w);
-            if (player2) homeTank2.collideWithWall(w);
+            homeTank.collideWithObject(w);
+            if (player2) homeTank2.collideWithObject(w);
             w.draw(graphics);
         }
 
         for (int i = 0; i < otherWall.size(); i++) {
             CommonWall cw = otherWall.get(i);
-            homeTank.collideWithWall(cw);
-            if (player2) homeTank2.collideWithWall(cw);
+            homeTank.collideWithObject(cw);
+            if (player2) homeTank2.collideWithObject(cw);
             cw.draw(graphics);
         }
 
         for (int i = 0; i < homeWall.size(); i++) {
             CommonWall w = homeWall.get(i);
-            homeTank.collideWithWall(w);
-            if (player2) homeTank2.collideWithWall(w);
+            homeTank.collideWithObject(w);
+            if (player2) homeTank2.collideWithObject(w);
             w.draw(graphics);
         }
 
@@ -415,7 +415,6 @@ public class TankClient extends Frame implements ActionListener {
                 this.dispose();
                 TankClient player2add = new TankClient();
                 player2add.player2 = true;
-                keyHandler.setTankClient(player2add);
             } else {
                 printable = true;
                 new Thread(new PaintThread()).start();

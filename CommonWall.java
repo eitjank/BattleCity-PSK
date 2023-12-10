@@ -1,26 +1,20 @@
 import java.awt.*;
 
-public class CommonWall {
-	public static final int width = 22; 
-	public static final int length = 21;
-	int x, y;
-	private static Toolkit tk = Toolkit.getDefaultToolkit();
+public class CommonWall extends GameObject{
+	public static final int COMMON_WALL_WIDTH = 22; 
+	public static final int COMMON_WALL_LENGTH = 21;
+	private static final Toolkit tk = Toolkit.getDefaultToolkit();
 	private static Image[] wallImags = null;
 	static {
 		wallImags = new Image[] { 
 		tk.getImage(CommonWall.class.getResource("Images/commonWall.gif")), };
 	}
 
-	public CommonWall(int x, int y, TankClient tc) { 
-		this.x = x;
-		this.y = y;
+	public CommonWall(int x, int y) {
+		super(x, y, COMMON_WALL_WIDTH, COMMON_WALL_LENGTH);
 	}
 
 	public void draw(Graphics g) {
-		g.drawImage(wallImags[0], x, y, null);
-	}
-
-	public Rectangle getRect() {  
-		return new Rectangle(x, y, width, length);
+		g.drawImage(wallImags[0], this.pos.getX(),this.pos.getY(), null);
 	}
 }

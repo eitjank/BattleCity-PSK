@@ -5,12 +5,10 @@ public class KeyHandler implements KeyListener {
 
     private Tank homeTank;
     private Tank homeTank2;
-    private TankClient tankClient;
 
     public KeyHandler(Tank homeTank, Tank homeTank2, TankClient tankClient) {
         this.homeTank = homeTank;
         this.homeTank2 = homeTank2;
-        this.tankClient = tankClient;
     }
 
     @Override
@@ -51,10 +49,6 @@ public class KeyHandler implements KeyListener {
                 homeTank.fire();
                 break;
         }
-    }
-
-    public void setTankClient(TankClient tankClient) {
-        this.tankClient = tankClient;
     }
 
     private void handlePlayer2Input(int key) {

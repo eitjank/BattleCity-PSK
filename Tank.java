@@ -225,19 +225,11 @@ public class Tank extends DestructibleObject {
 	public Bullets fire() {
 		if (!live)
 			return null;
-		int x = this.pos.getX() + Tank.TANK_WIDTH / 2 - Bullets.width / 2;
-		int y = this.pos.getY()  + Tank.TANK_LENGTH / 2 - Bullets.length / 2;
+		int x = this.pos.getX() + Tank.TANK_WIDTH / 2 - Bullets.WIDTH / 2;
+		int y = this.pos.getY()  + Tank.TANK_LENGTH / 2 - Bullets.LENGTH / 2;
 		Bullets m = new Bullets(x, y + 2, good, myDirection, this.tc);
 		tc.bullets.add(m);
 		return m;
-	}
-
-	public boolean isLive() {
-		return live;
-	}
-
-	public void setLive(boolean live) {
-		this.live = live;
 	}
 
 	public boolean isGood() {
@@ -245,18 +237,6 @@ public class Tank extends DestructibleObject {
 	}
 	public boolean collideWithObject(GameObject gameObject) {
 		return collisionHandler.handleCollisionsWithObject(this, gameObject);
-	}
-
-	public boolean collideWithWall(CommonWall wall) {
-		return collisionHandler.handleCollisionsWithWall(this, wall);
-	}
-
-	public boolean collideWithWall(MetalWall wall) {
-		return collisionHandler.handleCollisionsWithWall(this, wall);
-	}
-
-	public boolean collideHome(Home home) {
-		return collisionHandler.handleCollisionsWithHome(this, home);
 	}
 
 	public boolean collideWithTanks(List<Tank> tanks) {

@@ -19,7 +19,7 @@ public class GetBlood {
 				.getResource("Images/hp.png")), };
 	}
 
-	private int[][] poition = { { 700, 196 }, { 500, 58 }, { 80, 300 },
+	private int[][] position = { { 700, 196 }, { 500, 58 }, { 80, 300 },
 			{600,321}, { 345, 456 }, { 123, 321 }, { 258, 413 } };
 
 	public void draw(Graphics g) {
@@ -35,11 +35,11 @@ public class GetBlood {
 
 	private void move() {
 		step++;
-		if (step == poition.length) {
+		if (step == position.length) {
 			step = 0;
 		}
-		x = poition[step][0];
-		y = poition[step][1];
+		x = position[step][0];
+		y = position[step][1];
 	}
 
 	public Rectangle getRect() { 

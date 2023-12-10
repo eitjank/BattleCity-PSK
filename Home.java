@@ -5,11 +5,9 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
-public class Home {
-	private int x, y;
+public class Home extends DestructibleObject{
 	private TankClient tc;
-	public static final int width = 43, length = 43; 
-	private boolean live = true;
+	public static final int WIDTH = 43, LENGTH = 43;
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit(); 
 	private static Image[] homeImags = null;
@@ -19,8 +17,7 @@ public class Home {
 	}
 
 	public Home(int x, int y, TankClient tc) {
-		this.x = x;
-		this.y = y;
+		super(x, y, WIDTH, LENGTH);
 		this.tc = tc; 
 	}
 
@@ -46,7 +43,7 @@ public class Home {
 	public void draw(Graphics g) {
 
 		if (live) { 
-			g.drawImage(homeImags[0], x, y, null);
+			g.drawImage(homeImags[0], this.pos.getX(), this.pos.getY(), null);
 
 			for (int i = 0; i < tc.homeWall.size(); i++) {
 				CommonWall w = tc.homeWall.get(i);
@@ -56,18 +53,6 @@ public class Home {
 			gameOver(g); 
 
 		}
-	}
-
-	public boolean isLive() { 
-		return live;
-	}
-
-	public void setLive(boolean live) { 
-		this.live = live;
-	}
-
-	public Rectangle getRect() { 
-		return new Rectangle(x, y, width, length);
 	}
 
 }

@@ -1,27 +1,23 @@
 import java.awt.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class Bullets {
+public class Bullets extends DestructibleObject {
 	public static int speedX = 12;
 	public static int speedY = 12;
 
-	public static final int width = 10;
-	public static final int length = 10;
+	public static final int WIDTH = 10;
+	public static final int LENGTH = 10;
 
-	private int x, y;
 	private Direction direction;
 
 	private boolean good;
-	private boolean live = true;
 
 	private TankClient tc;
-	private static Map<String, Image> imgs = new HashMap<String, Image>();
+	private static final Map<String, Image> imgs = new HashMap<String, Image>();
 
 	public Bullets(int x, int y, Direction dir) {
-		this.x = x;
-		this.y = y;
+		super(x, y, WIDTH, LENGTH);
 		this.direction = dir;
 	}
 
@@ -34,26 +30,26 @@ public class Bullets {
 	private void move() {
 		switch (direction) {
 			case L:
-				x -= speedX;
+				this.setPos(new Position(this.pos.getX() - speedX, this.pos.getY()));
 				break;
 
 			case U:
-				y -= speedY;
+				this.setPos(new Position(this.pos.getX(), this.pos.getY() - speedY));
 				break;
 
 			case R:
-				x += speedX;
+				this.setPos(new Position(this.pos.getX() + speedX, this.pos.getY()));
 				break;
 
 			case D:
-				y += speedY;
+				this.setPos(new Position(this.pos.getX(), this.pos.getY() + speedY));
 				break;
 
 			case STOP:
 				break;
 		}
 
-		if (x < 0 || y < 0 || x > TankClient.FRAME_WIDTH || y > TankClient.FRAME_LENGTH) {
+		if (this.pos.getX() < 0 || this.pos.getY() < 0 || this.pos.getX() > TankClient.FRAME_WIDTH || this.pos.getY() > TankClient.FRAME_LENGTH) {
 			live = false;
 		}
 	}
@@ -66,40 +62,29 @@ public class Bullets {
 
 		switch (direction) {
 			case L:
-				g.drawImage(imgs.get("L"), x, y, null);
+				g.drawImage(imgs.get("L"), this.pos.getX(), this.pos.getY(), null);
 				break;
 
 			case U:
-				g.drawImage(imgs.get("U"), x, y, null);
+				g.drawImage(imgs.get("U"), this.pos.getX(), this.pos.getY(), null);
 				break;
 
 			case R:
-				g.drawImage(imgs.get("R"), x, y, null);
+				g.drawImage(imgs.get("R"), this.pos.getX(), this.pos.getY(), null);
 				break;
 
 			case D:
-				g.drawImage(imgs.get("D"), x, y, null);
+				g.drawImage(imgs.get("D"), this.pos.getX(), this.pos.getY(), null);
 				break;
 		}
 
 		Image bulletImage = BulletImageLoader.getBulletImage(direction.toString());
-		g.drawImage(bulletImage, x, y, null);
+		g.drawImage(bulletImage, this.pos.getX(), this.pos.getY(), null);
 
 		move();
 	}
 
-	public boolean isLive() {
-		return live;
-	}
-
-	public Rectangle getRect() {
-		return new Rectangle(x, y, width, length);
-	}
-
 	public boolean isGood() {
 		return good;
-	}
-	public void setLive(boolean live) {
-		this.live = live;
 	}
 }

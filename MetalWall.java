@@ -3,10 +3,9 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
-public class MetalWall {
-	public static final int width = 36; 
-	public static final int length = 37;
-	private int x, y;
+public class MetalWall extends GameObject {
+	public static final int WIDTH = 36;
+	public static final int LENGTH = 37;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static Image[] wallImags = null;
 	static {
@@ -14,16 +13,12 @@ public class MetalWall {
 				.getResource("Images/metalWall.gif")), };
 	}
 
-	public MetalWall(int x, int y, TankClient tc) {
-		this.x = x;
-		this.y = y;
+	public MetalWall(int x, int y) {
+		super(x, y, WIDTH, LENGTH);
 	}
 
 	public void draw(Graphics g) { 
-		g.drawImage(wallImags[0], x, y, null);
+		g.drawImage(wallImags[0], this.pos.getX(), this.pos.getY(), null);
 	}
 
-	public Rectangle getRect() { 
-		return new Rectangle(x, y, width, length);
-	}
 }

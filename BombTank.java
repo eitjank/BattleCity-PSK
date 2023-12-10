@@ -2,9 +2,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 
-public class BombTank {
-	private int x, y;
-	private boolean live = true; 
+public class BombTank extends DestructibleObject{
 	private TankClient tc;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 
@@ -32,8 +30,7 @@ public class BombTank {
 	int step = 0;
 
 	public BombTank(int x, int y, TankClient tc) {
-		this.x = x;
-		this.y = y;
+		super(x, y, 0, 0);
 		this.tc = tc;
 	}
 
@@ -49,7 +46,7 @@ public class BombTank {
 			return;
 		}
 
-		g.drawImage(imgs[step], x, y, null);
+		g.drawImage(imgs[step], this.pos.getX(), this.pos.getY(), null);
 		step++;
 	}
 }

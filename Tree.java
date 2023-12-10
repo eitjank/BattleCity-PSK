@@ -6,7 +6,6 @@ public class Tree {
 	public static final int width = 30;
 	public static final int length = 30;
 	int x, y;
-	TankClient tc ;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static Image[] treeImags = null;
 	static {
@@ -15,11 +14,9 @@ public class Tree {
 		};
 	}
 	
-	
-	public Tree(int x, int y, TankClient tc) { 
+	public Tree(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.tc = tc;
 	}
 	
 	public void draw(Graphics g) {        
