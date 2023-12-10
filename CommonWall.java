@@ -4,8 +4,6 @@ public class CommonWall {
 	public static final int width = 22; 
 	public static final int length = 21;
 	int x, y;
-
-	TankClient tc;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static Image[] wallImags = null;
 	static {
@@ -16,7 +14,6 @@ public class CommonWall {
 	public CommonWall(int x, int y, TankClient tc) { 
 		this.x = x;
 		this.y = y;
-		this.tc = tc; 
 	}
 
 	public void draw(Graphics g) {

@@ -11,7 +11,7 @@ public class Bullets {
 	public static final int length = 10;
 
 	private int x, y;
-	Direction diretion;
+	Direction direction;
 
 	private boolean good;
 	private boolean live = true;
@@ -50,7 +50,7 @@ public class Bullets {
 	public Bullets(int x, int y, Direction dir) { 
 		this.x = x;
 		this.y = y;
-		this.diretion = dir;
+		this.direction = dir;
 	}
 
 	public Bullets(int x, int y, boolean good, Direction dir, TankClient tc) {
@@ -61,7 +61,7 @@ public class Bullets {
 
 	private void move() {
 
-		switch (diretion) {
+		switch (direction) {
 		case L:
 			x -= speedX;
 			break;
@@ -82,8 +82,8 @@ public class Bullets {
 			break;
 		}
 
-		if (x < 0 || y < 0 || x > TankClient.FRAM_WIDTH
-				|| y > TankClient.FRAM_LENGTH) {
+		if (x < 0 || y < 0 || x > TankClient.FRAME_WIDTH
+				|| y > TankClient.FRAME_LENGTH) {
 			live = false;
 		}
 	}
@@ -94,7 +94,7 @@ public class Bullets {
 			return;
 		}
 
-		switch (diretion) { 
+		switch (direction) {
 		case L:
 			g.drawImage(imgs.get("L"), x, y, null);
 			break;
@@ -138,7 +138,7 @@ public class Bullets {
 		if (this.live && this.getRect().intersects(t.getRect()) && t.isLive()
 				&& this.good != t.isGood()) {
 
-			BombTank e = new BombTank(t.getX(), t.getY(), tc);
+			BombTank e = new BombTank(t.getPos().getX(), t.getPos().getY(), tc);
 			tc.bombTanks.add(e);
 			if (t.isGood()) {
 				t.setLife(t.getLife() - 50); 

@@ -7,7 +7,6 @@ public class MetalWall {
 	public static final int width = 36; 
 	public static final int length = 37;
 	private int x, y;
-	TankClient tc;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static Image[] wallImags = null;
 	static {
@@ -18,7 +17,6 @@ public class MetalWall {
 	public MetalWall(int x, int y, TankClient tc) {
 		this.x = x;
 		this.y = y;
-		this.tc = tc;
 	}
 
 	public void draw(Graphics g) { 

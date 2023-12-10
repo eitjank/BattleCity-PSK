@@ -3,15 +3,59 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
-public class Tank {
-	private static final int LENGHT = 35;
-	private static final int WIDTH = 35;
+public class Tank extends DestructibleObject {
+	private static final int TANK_LENGTH = 35;
+	private static final int TANK_WIDTH = 35;
 	private static int speedX = 6;
 	private static int speedY = 6;
 	private static int count = 0;
-	private Position position;
-	private TankDrawer drawer;
+	private static final TankDrawer drawer = new TankDrawer();
+	private Direction direction = Direction.STOP;
+	private Direction myDirection = Direction.U;
+	TankClient tc;
+	private int player=0;
+	private final java.util.Map<Integer, Command> commandMap = new HashMap<>();
+	private boolean good;
+	private int oldX;
+	private int oldY;
+	private int life = 200;
+	private int rate=1;
+	private static final Random r = new Random();
+	private int step = r.nextInt(10)+5 ;
 
+	private boolean isMovingLeft = false;
+	private boolean isMovingUp = false;
+	private boolean isMovingRight = false;
+	private boolean isMovingDown = false;
+
+	public Tank(int x, int y, boolean good) {
+		super(x, y, TANK_WIDTH, TANK_LENGTH);
+		this.oldX = this.pos.getX();
+		this.oldY = this.pos.getY();
+		this.good = good;
+	}
+
+	public Tank(int x, int y, boolean good, Direction dir, TankClient tc, int player) {
+		this(x, y, good);
+		this.direction = dir;
+		this.tc = tc;
+		this.player = player;
+		if(player == 1) {
+			commandMap.put(KeyEvent.VK_W, new MoveUpCommand(this));
+			commandMap.put(KeyEvent.VK_S, new MoveDownCommand(this));
+			commandMap.put(KeyEvent.VK_A, new MoveLeftCommand(this));
+			commandMap.put(KeyEvent.VK_D, new MoveRightCommand(this));
+			commandMap.put(KeyEvent.VK_F, new FireCommand(this));
+		}
+		else if(player == 2) {
+			commandMap.put(KeyEvent.VK_UP, new MoveUpCommand(this));
+			commandMap.put(KeyEvent.VK_DOWN, new MoveDownCommand(this));
+			commandMap.put(KeyEvent.VK_LEFT, new MoveLeftCommand(this));
+			commandMap.put(KeyEvent.VK_RIGHT, new MoveRightCommand(this));
+			commandMap.put(KeyEvent.VK_SLASH, new FireCommand(this));
+		}
+		commandMap.put(KeyEvent.VK_R, new RestartGameCommand(this));
+	}
 	public int getSpeedX() {
 		return speedX;
 	}
@@ -36,121 +80,50 @@ public class Tank {
 		Tank.count = count;
 	}
 
-	private Direction direction = Direction.STOP;
-	private Direction myDirection = Direction.U;
-	TankClient tc;
-	private int player=0;
-	private boolean good;
-	private int x;
-	private int y;
-	private int oldX;
-	private int oldY;
-	private boolean live = true;
-	private int life = 200;
-	private int rate=1;
-	private static Random r = new Random();
-	private int step = r.nextInt(10)+5 ;
-
-	private boolean isMovingLeft = false;
-	private boolean isMovingUp = false;
-	private boolean isMovingRight = false;
-	private boolean isMovingDown = false;
-
-
-	private static Toolkit tk = Toolkit.getDefaultToolkit();
-	private static Image[] tankImags = null;
-	static {
-		tankImags = new Image[] {
-				tk.getImage(BombTank.class.getResource("Images/tankD.gif")),
-				tk.getImage(BombTank.class.getResource("Images/tankU.gif")),
-				tk.getImage(BombTank.class.getResource("Images/tankL.gif")),
-				tk.getImage(BombTank.class.getResource("Images/tankR.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankD.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankU.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankL.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankR.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankD2.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankU2.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankL2.gif")),
-				tk.getImage(BombTank.class.getResource("Images/HtankR2.gif")),
-		};
-
+	public void setMovingLeft(boolean movingLeft) {
+		isMovingLeft = movingLeft;
 	}
 
-	public Tank(int x, int y, boolean good) {
-		this.position = new Position(x, y);
-		this.oldX = position.getX();
-		this.oldY = position.getY();
-		this.good = good;
+	public void setMovingUp(boolean movingUp) {
+		isMovingUp = movingUp;
 	}
 
-	public Tank(int x, int y, boolean good, Direction dir, TankClient tc, int player) {
-		this(x, y, good);
-		this.direction = dir;
-		this.tc = tc;
-		this.player = player;
+	public void setMovingRight(boolean movingRight) {
+		isMovingRight = movingRight;
+	}
+
+	public void setMovingDown(boolean movingDown) {
+		isMovingDown = movingDown;
 	}
 
 	public void draw(Graphics g) {
-		if (!live) {
+		if (!this.live) {
 			if (!good) {
 				tc.tanks.remove(this);
 			}
 			return;
 		}
-		switch (myDirection) {
-
-			case D:
-				if(player==1){	g.drawImage(tankImags[4], position.getX(), position.getY(), null);
-				}
-				else if(tc.player2&&player==2){
-					g.drawImage(tankImags[8], position.getX(), position.getY(), null);
-				}else{
-					g.drawImage(tankImags[0], position.getX(), position.getY(), null);}
-				break;
-
-			case U:
-				if(player==1){	g.drawImage(tankImags[5], position.getX(), position.getY(), null);
-				}else if(tc.player2&&player==2){
-					g.drawImage(tankImags[9], position.getX(), position.getY(), null);
-				}else{
-					g.drawImage(tankImags[1], position.getX(), position.getY(), null);}
-				break;
-			case L:if(player==1){	g.drawImage(tankImags[6], position.getX(), position.getY(), null);
-			}else if(tc.player2&&player==2){
-				g.drawImage(tankImags[10], position.getX(), position.getY(), null);
-			}else{
-				g.drawImage(tankImags[2], position.getX(), position.getY(), null);}
-				break;
-
-			case R:if(player==1){	g.drawImage(tankImags[7], position.getX(), position.getY(), null);
-			}else if(tc.player2&&player==2){
-				g.drawImage(tankImags[11], position.getX(), position.getY(), null);
-			}else{
-				g.drawImage(tankImags[3], position.getX(), position.getY(), null);}
-				break;
-
-		}
+        drawer.draw(g, this.pos, myDirection, this.player);
 
 		move();
 	}
 
 	void move() {
-		this.oldX = position.getX();
-		this.oldY = position.getY();
+		this.oldX = this.pos.getX();
+		this.oldY = this.pos.getY();
 
 		switch (direction) {
 			case L:
-				position.setX(position.getX() - speedX);
+				this.pos.setX(this.pos.getX() - speedX);
 				break;
 			case U:
-				position.setY(position.getY() - speedY);
+				this.pos.setY(this.pos.getY() - speedY);
 				break;
 			case R:
-				position.setX(position.getX() + speedX);
+				this.pos.setX(this.pos.getX() + speedX);
 				break;
 			case D:
-				position.setY(position.getY() + speedY);
+				this.pos.setY(this.pos.getY() + speedY);
 				break;
 			case STOP:
 				break;
@@ -160,109 +133,81 @@ public class Tank {
 			this.myDirection = this.direction;
 		}
 
-		if (position.getX() < 0)
-			position.setX(0);
-		if (position.getY() < 40)
-			position.setY(40);
-		if (position.getX() + Tank.WIDTH > TankClient.FRAM_WIDTH)
-			x = TankClient.FRAM_WIDTH - Tank.WIDTH;
-		if (position.getY() + Tank.LENGHT > TankClient.FRAM_LENGTH)
-			y = TankClient.FRAM_WIDTH - Tank.LENGHT;
+		handleBoundaries();
 
 		if (!good) {
-			Direction[] directons = Direction.values();
+			Direction[] directions = Direction.values();
 			if (step == 0) {
 				step = r.nextInt(12) + 3;
 				int mod=r.nextInt(9);
-				if (playertankaround()){
-					if(position.getX()==tc.homeTank.x){ if(position.getY()>tc.homeTank.y) direction=directons[1];
-					else if (position.getY()<tc.homeTank.y) direction=directons[3];
-					}else if(position.getY()==tc.homeTank.y){ if(position.getX()>tc.homeTank.x) direction=directons[0];
-					else if (position.getX()<tc.homeTank.x) direction=directons[2];
-					}
-					else{
-						int rn = r.nextInt(directons.length);
-						direction = directons[rn];
-					}
-					rate=2;
-				}else if (mod==1){
-					rate=1;
-				}else if(1<mod&&mod<=3){
-					rate=1;
-				}else{
-					int rn = r.nextInt(directons.length);
-					direction = directons[rn];
-					rate=1;}
+				if (playerTankAround()){
+					handlePlayerTankAround(directions);
+				}else handleNoPlayerTankAround(mod, directions);
 			}
 			step--;
-			if(rate==2){
-				if (r.nextInt(40) > 35)
-					this.fire();
-			}else if (r.nextInt(40) > 38)
+			handleRate();
+		}
+	}
+
+	private void handlePlayerTankAround(Direction[] directions) {
+		if(this.pos.getX()==tc.homeTank.getPos().getX()){
+			if(this.pos.getY()>tc.homeTank.getPos().getY()) direction= directions[1];
+			else if (this.pos.getY()<tc.homeTank.getPos().getY()) direction= directions[3];
+		}else if(this.pos.getY()==tc.homeTank.getPos().getY()){
+			if(this.pos.getX()>tc.homeTank.getPos().getX()) direction= directions[0];
+			else if (this.pos.getX()<tc.homeTank.getPos().getX()) direction= directions[2];
+		}
+		else{
+			int rn = r.nextInt(directions.length);
+			direction = directions[rn];
+		}
+		rate=2;
+	}
+
+	private void handleNoPlayerTankAround(int mod, Direction[] directions) {
+        if (mod != 1 && (1 >= mod || mod > 3)) {
+            int rn = r.nextInt(directions.length);
+            direction = directions[rn];
+        }
+        rate=1;
+    }
+
+	private void handleRate() {
+		if(rate==2){
+			if (r.nextInt(40) > 35)
 				this.fire();
-		}
+		}else if (r.nextInt(40) > 38)
+			this.fire();
 	}
-	public boolean playertankaround(){
-		int rx=position.getX()-15;
-		int ry=position.getY()-15;
-		if((position.getX()-15)<0) rx=0;
-		if((position.getY()-15)<0)ry=0;
+
+	private void handleBoundaries() {
+		if (this.pos.getX() < 0)
+			this.pos.setX(0);
+		if (this.pos.getY() < 40)
+			this.pos.setY(40);
+		if (this.pos.getX() + Tank.TANK_WIDTH > TankClient.FRAME_WIDTH)
+			this.pos.setX(TankClient.FRAME_WIDTH - Tank.TANK_WIDTH);
+		if (this.pos.getY() + Tank.TANK_LENGTH > TankClient.FRAME_LENGTH)
+			this.pos.setY(TankClient.FRAME_WIDTH - Tank.TANK_LENGTH);
+	}
+
+	public boolean playerTankAround(){
+		int rx=this.pos.getX()-15;
+		int ry=this.pos.getY()-15;
+		if((this.pos.getX()-15)<0) rx=0;
+		if((this.pos.getY()-15)<0) ry=0;
 		Rectangle a=new Rectangle(rx, ry,60,60);
-		if (this.live && a.intersects(tc.homeTank.getRect())) {
-			return true;
-		}
-		return false;
-	}
-	public int getDirect(int b){
-		return 4;
-	}
+        return this.live && a.intersects(tc.homeTank.getRect());
+    }
 	private void changToOldDir() {
-		position.setX(oldX);
-		position.setY(oldY);
+		this.pos.setX(oldX);
+		this.pos.setY(oldY);
 	}
 
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-		if (player==1){
-			switch (key) {
-				case KeyEvent.VK_R:
-					restartGame();
-					break;
-
-				case KeyEvent.VK_D:
-					isMovingRight = true;
-					break;
-
-				case KeyEvent.VK_A:
-					isMovingLeft = true;
-					break;
-
-				case KeyEvent.VK_W:
-					isMovingUp = true;
-					break;
-
-				case KeyEvent.VK_S:
-					isMovingDown = true;
-					break;
-			}}
-		if (player==2){
-			switch(key){
-				case KeyEvent.VK_RIGHT:
-					isMovingRight = true;
-					break;
-
-				case KeyEvent.VK_LEFT:
-					isMovingLeft = true;
-					break;
-
-				case KeyEvent.VK_UP:
-					isMovingUp = true;
-					break;
-
-				case KeyEvent.VK_DOWN:
-					isMovingDown = true;
-					break;
-			}
+		if (commandMap.containsKey(key)) {
+			commandMap.get(key).execute();
 		}
 		decideDirection();
 	}
@@ -278,7 +223,7 @@ public class Tank {
 		}
 	}
 
-	private void restartGame() {
+	public void restartGame() {
 		tc.tanks.clear();
 		tc.bullets.clear();
 		tc.trees.clear();
@@ -287,7 +232,7 @@ public class Tank {
 		tc.metalWall.clear();
 		tc.homeTank.setLive(false);
 
-		if (tc.tanks.size() == 0) {
+		if (tc.tanks.isEmpty()) {
 			initializeEnemyTanks();
 		}
 
@@ -319,72 +264,20 @@ public class Tank {
 
 	public void keyReleased(KeyEvent e) {
 		int key = e.getKeyCode();
-		if (player==1){
-			switch (key) {
-
-				case KeyEvent.VK_F:
-					fire();
-					break;
-
-				case KeyEvent.VK_D:
-					isMovingRight = false;
-					break;
-
-				case KeyEvent.VK_A:
-					isMovingLeft = false;
-					break;
-
-				case KeyEvent.VK_W:
-					isMovingUp = false;
-					break;
-
-				case KeyEvent.VK_S:
-					isMovingDown = false;
-					break;
-
-
-			}}
-		if (player==2){
-			switch (key) {
-
-				case KeyEvent.VK_SLASH:
-					fire();
-					break;
-
-				case KeyEvent.VK_RIGHT:
-					isMovingRight = false;
-					break;
-
-				case KeyEvent.VK_LEFT:
-					isMovingLeft = false;
-					break;
-
-				case KeyEvent.VK_UP:
-					isMovingUp = false;
-					break;
-
-				case KeyEvent.VK_DOWN:
-					isMovingDown = false;
-					break;
-
-
-			}}
+		if (commandMap.containsKey(key)) {
+			commandMap.get(key).stopExecution();
+		}
 		decideDirection();
 	}
 
 	public Bullets fire() {
 		if (!live)
 			return null;
-		int X = position.getX() + Tank.WIDTH / 2 - Bullets.width / 2;
-		int Y = position.getY()  + Tank.LENGHT / 2 - Bullets.length / 2;
-		Bullets m = new Bullets(X, Y + 2, good, myDirection, this.tc);
+		int x = this.pos.getX() + Tank.TANK_WIDTH / 2 - Bullets.width / 2;
+		int y = this.pos.getY()  + Tank.TANK_LENGTH / 2 - Bullets.length / 2;
+		Bullets m = new Bullets(x, y + 2, good, myDirection, this.tc);
 		tc.bullets.add(m);
 		return m;
-	}
-
-
-	public Rectangle getRect() {
-		return new Rectangle(position.getX(), position.getY(), WIDTH, LENGHT);
 	}
 
 	public boolean isLive() {
@@ -398,7 +291,13 @@ public class Tank {
 	public boolean isGood() {
 		return good;
 	}
-
+	public boolean collideWithObject(GameObject gameObject) {
+		if (this.live && this.getRect().intersects(gameObject.getRect())) {
+			this.changToOldDir();
+			return true;
+		}
+		return false;
+	}
 	public boolean collideWithWall(CommonWall w) {
 		if (this.live && this.getRect().intersects(w.getRect())) {
 			this.changToOldDir();
@@ -409,14 +308,6 @@ public class Tank {
 
 	public boolean collideWithWall(MetalWall w) {
 		if (this.live && this.getRect().intersects(w.getRect())) {
-			this.changToOldDir();
-			return true;
-		}
-		return false;
-	}
-
-	public boolean collideRiver(River r) {
-		if (this.live && this.getRect().intersects(r.getRect())) {
 			this.changToOldDir();
 			return true;
 		}
@@ -462,13 +353,4 @@ public class Tank {
 		}
 		return false;
 	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
 }

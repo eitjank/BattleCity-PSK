@@ -7,7 +7,6 @@ public class GetBlood {
 	public static final int length = 30;
 
 	private int x, y;
-	TankClient tc;
 	private static Random r = new Random();
 
 	int step = 0; 

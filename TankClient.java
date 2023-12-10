@@ -10,8 +10,8 @@ public class TankClient extends Frame implements ActionListener {
      *
      */
     private static final long serialVersionUID = 1L;
-    public static final int FRAM_WIDTH = 800;
-    public static final int FRAM_LENGTH = 600;
+    public static final int FRAME_WIDTH = 800;
+    public static final int FRAME_LENGTH = 600;
     private boolean printable = true;
     private MenuBar menu = null;
     private Menu gameMenu = null;
@@ -47,16 +47,16 @@ public class TankClient extends Frame implements ActionListener {
     List<CommonWall> homeWall = new ArrayList<CommonWall>();
     List<CommonWall> otherWall = new ArrayList<CommonWall>();
     List<MetalWall> metalWall = new ArrayList<MetalWall>();
-    private static final String TIMES_NEW_ROMAN = "Times New Roman";
+    private static final String TIMES_NEW_ROMAN_TEXT = "Times New Roman";
 
     public void update(Graphics graphics) {
 
-        screenImage = this.createImage(FRAM_WIDTH, FRAM_LENGTH);
+        screenImage = this.createImage(FRAME_WIDTH, FRAME_LENGTH);
 
         Graphics gps = screenImage.getGraphics();
         Color color = gps.getColor();
         gps.setColor(Color.GRAY);
-        gps.fillRect(0, 0, FRAM_WIDTH, FRAM_LENGTH);
+        gps.fillRect(0, 0, FRAME_WIDTH, FRAME_LENGTH);
         gps.setColor(color);
         framPaint(gps);
         graphics.drawImage(screenImage, 0, 0, null);
@@ -68,29 +68,29 @@ public class TankClient extends Frame implements ActionListener {
         graphics.setColor(Color.green);
 
         Font f1 = graphics.getFont();
-        graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 20));
+        graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 20));
         graphics.drawString("Tanks left in the field: ", player2 ? 100 : 200, 70);
-        graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.ITALIC, 30));
+        graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.ITALIC, 30));
         graphics.drawString("" + tanks.size(), player2 ? 300 : 400, 70);
-        graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 20));
+        graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 20));
         graphics.drawString("Health: ", player2 ? 380 : 580, 70);
-        graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.ITALIC, 30));
+        graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.ITALIC, 30));
         if (!player2) graphics.drawString("" + homeTank.getLife(), 650, 70);
         else graphics.drawString("Player1: " + homeTank.getLife() + "    Player2:" + homeTank2.getLife(), 450, 70);
         graphics.setFont(f1);
         if (!player2) {
-            if (tanks.size() == 0 && home.isLive() && homeTank.isLive() && lose == false) {
+            if (tanks.isEmpty() && home.isLive() && homeTank.isLive() && !lose) {
                 Font f = graphics.getFont();
-                graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 60));
+                graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 60));
                 this.otherWall.clear();
                 graphics.drawString("Congratulations! ", 200, 300);
                 graphics.setFont(f);
                 win = true;
             }
 
-            if (homeTank.isLive() == false && win == false) {
+            if (!homeTank.isLive() && !win) {
                 Font f = graphics.getFont();
-                graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 40));
+                graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 40));
                 tanks.clear();
                 bullets.clear();
                 graphics.drawString("Sorry. You lose!", 200, 300);
@@ -98,18 +98,18 @@ public class TankClient extends Frame implements ActionListener {
                 graphics.setFont(f);
             }
         } else {
-            if (tanks.size() == 0 && home.isLive() && (homeTank.isLive() || homeTank2.isLive()) && lose == false) {
+            if (tanks.isEmpty() && home.isLive() && (homeTank.isLive() || homeTank2.isLive()) && !lose) {
                 Font f = graphics.getFont();
-                graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 60));
+                graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 60));
                 this.otherWall.clear();
                 graphics.drawString("Congratulations! ", 200, 300);
                 graphics.setFont(f);
                 win = true;
             }
 
-            if (homeTank.isLive() == false && homeTank2.isLive() == false && win == false) {
+            if (!homeTank.isLive() && !homeTank2.isLive() && !win) {
                 Font f = graphics.getFont();
-                graphics.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 40));
+                graphics.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 40));
                 tanks.clear();
                 bullets.clear();
                 graphics.drawString("Sorry. You lose!", 200, 300);
@@ -123,9 +123,10 @@ public class TankClient extends Frame implements ActionListener {
             r.draw(graphics);
         }
 
-        for (River r : theRiver) {
-            homeTank.collideRiver(r);
-            if (player2) homeTank2.collideRiver(r);
+        for (int i = 0; i < theRiver.size(); i++) {
+            River r = theRiver.get(i);
+            homeTank.collideWithObject(r);
+            if (player2) homeTank2.collideWithObject(r);
             r.draw(graphics);
         }
 
@@ -185,7 +186,7 @@ public class TankClient extends Frame implements ActionListener {
             }
             for (int j = 0; j < theRiver.size(); j++) {
                 River r = theRiver.get(j);
-                t.collideRiver(r);
+                t.collideWithObject(r);
                 r.draw(graphics);
             }
 
@@ -274,7 +275,7 @@ public class TankClient extends Frame implements ActionListener {
     }
 
     private void initializeFrame() {
-        this.setSize(FRAM_WIDTH, FRAM_LENGTH);
+        this.setSize(FRAME_WIDTH, FRAME_LENGTH);
         this.setLocation(280, 50);
         this.setTitle("Battle City    Final Project for CPE 640");
 
@@ -309,7 +310,7 @@ public class TankClient extends Frame implements ActionListener {
     }
 
     private void initializeRiver() {
-        theRiver.add(new River(85, 100, this));
+        theRiver.add(new River(85, 100));
     }
 
     private void initializeTrees() {
@@ -430,7 +431,7 @@ public class TankClient extends Frame implements ActionListener {
 
     private void setMenuFont(Menu... menus) {
         for (Menu menu : menus) {
-            menu.setFont(new Font(TIMES_NEW_ROMAN, Font.BOLD, 15));
+            menu.setFont(new Font(TIMES_NEW_ROMAN_TEXT, Font.BOLD, 15));
         }
     }
 
