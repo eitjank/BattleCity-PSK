@@ -1,8 +1,6 @@
 import java.awt.*;
 
 public class CommonWall extends GameObject{
-	private int x;
-	private int y;
 	public static final int COMMON_WALL_WIDTH = 22; 
 	public static final int COMMON_WALL_LENGTH = 21;
 	private static final Toolkit tk = Toolkit.getDefaultToolkit();
@@ -29,6 +27,6 @@ public class CommonWall extends GameObject{
 			return false;
 		}
 		CommonWall other = (CommonWall) obj;
-		return x == other.x && y == other.y;
+		return pos.getX() == other.pos.getX() && pos.getY() == other.pos.getY();
 	}
 }
